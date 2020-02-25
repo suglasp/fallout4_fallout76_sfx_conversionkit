@@ -10,14 +10,18 @@ This depends if you use the Bethesda launcher or Steam for each game.
 Currently, FO4 is only available on Steam. FO76 is only available through the Bethesda launcher.
 FO76 will be available on Steam from April 2020.
 
-Anyway, nativate for each game to the <install folder>\Data.
-Locate each *.ba2 files.
-For FO76, you want the files:
+Any way, nativigate for each game to the <install folder>\Data.
+Locate each *.ba2 compressed game files.
+
+For FO76, you want these files for sfx/music:
 - SeventySix - Sounds01.ba2
 - SeventySix - Sounds02.ba2
 - SeventySix - Voices.ba2
 - SeventySix - Startup.ba2
 - SeventySix - ??UpdateStream.ba2  (Where ?? is a double number from 00, 01, 02 to .. for each update)
+
+For FO4, you want these files for sfx/music:
+- Fallout4 - Sounds.ba2
 
 Extract with BAE for each ba2 file, the sounds and music packed folders.
 For each ba2 file, i create a sub folder with the same name under "C:\Extracted".
@@ -28,7 +32,7 @@ Make a subfolder "C:\Extracted\ffmpeg"
 Make a subfolder "C:\Extracted\xWMAEncode"
 
 Download xWMAEncode.exe to "C:\Extracted\xWMAEncode" from https://www.nexusmods.com/skyrim/mods/32075/?tab=files
-Download ffmpeg static for Windows to "C:\Extracted\ffmpeg" from https://ffmpeg.zeranoe.com/builds/
+Download ffmpeg static compiled for Windows to "C:\Extracted\ffmpeg" from https://ffmpeg.zeranoe.com/builds/
 
 Step 3)  -> follow each step as described. This will generate a lot of Gigabytes of data!
 Start powershell
