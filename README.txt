@@ -1,16 +1,16 @@
 Fallout 4 and Fallout 76 sfx and music conversion kit for PC.
 
 Steps:
-Step 1) -> this takes the longest and most manual work. This will generate a lot of Gigabytes of data!
+Step 1) -> this takes the longest and is the most manual work. This will generate a lot of Gigabytes of data!
 Download BAE tool here  https://www.nexusmods.com/fallout4/mods/78/?
 Make a folder for file extraction, for example "C:\Extracted"
 
 Browse to the Fallout 4 or Fallout 76 Intallation folders.
 This depends if you use the Bethesda launcher or Steam for each game.
 Currently, FO4 is only available on Steam. FO76 is only available through the Bethesda launcher.
-FO76 will be available on Steam from April 2020.
+(FO76 will be available on Steam from April 2020 when Wastelanders arrive.)
 
-Any way, nativigate for each game to the <install folder>\Data.
+Any way, navigate for each game to the <install folder>\Data.
 Locate each *.ba2 compressed game files.
 
 For FO76, you want these files for sfx/music:
@@ -42,4 +42,4 @@ Set-Location C:\Extracted
 
 
 Have fun,
-Pieter De Ridder
+Pieter De Ridder aka Suglasp
