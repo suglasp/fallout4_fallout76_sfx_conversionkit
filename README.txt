@@ -1,5 +1,13 @@
 Fallout 4 and Fallout 76 sfx and music conversion kit for PC.
 
+-----
+Optional update 15/03/2020:
+I've included a script 'fo76_ba2_archive_extracter_early_test.ps1' that can extract BA2 archive files.
+Currently it works to extract all *.xmp files (= SFX files) from the ba2 archives.
+Compressed files are mostly ZLib or LZ4 compression. I've been testing with ZLib (DeflateStream in .NET),
+but this seems not to correctly decompress those files.
+-----
+
 Steps:
 Step 1) -> this takes the longest and is the most manual work. This will generate a lot of Gigabytes of data!
 Download BAE tool here  https://www.nexusmods.com/fallout4/mods/78/?
