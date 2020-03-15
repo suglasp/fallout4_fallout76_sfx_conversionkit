@@ -2,6 +2,8 @@
 #
 # Pieter De Ridder
 # Script to convert wav to mp3 in a loop
+# created : 25/02/2020
+# updated : 15/03/2020
 #
 
 # Global vars
@@ -96,4 +98,4 @@ Function Convert-WavBulk {
 # .wav files get converted, serial wise a.k.a. synchronious, to .mp3.
 # the output mp3 file is placed next to the existing wav file.
 #
-Convert-WavBulk -Root ".\"
+Convert-WavBulk -Root ".\extracted_sfx"

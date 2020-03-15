@@ -2,6 +2,8 @@
 #
 # Pieter De Ridder
 # Script to convert Xwm to wav in a loop
+# created : 25/02/2020
+# updated : 15/03/2020
 #
 
 # Global vars
@@ -88,4 +90,4 @@ Function Convert-XwmBulk  {
 # .xmp files get converted, serial wise a.k.a. synchronious, to .wav.
 # the output wav file is placed next to the existing xmp file.
 #
-Convert-XwmBulk -Root ".\"
+Convert-XwmBulk -Root ".\extracted_sfx"

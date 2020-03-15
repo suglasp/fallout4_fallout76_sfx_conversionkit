@@ -1,11 +1,8 @@
 
 #
 # Pieter De Ridder
-# Extract Fallout 76 (Or Fallout 4) BA2 archive files
+# Extract Fallout 76 (Or Fallout 4) Sound files from BA2 archive files
 # 15/03/2020
-#
-# Currently, the script can only extract BA2 'GNRL' (= General) Archive files.
-# BA2 'DX10' (=DirectX Textures) and 'GNMF' (=PS4) files types are not supported.
 #
 # Note : Because I use Powershell and use objects, but not really use OO architecture,
 # i work in each Function with Open en Close file statements. Just to be safe.
@@ -358,39 +355,44 @@ Function Extract-BA2Data {
                     
                             If ($BA2FileTable.Length -gt 0) {                                                        
                                 ForEach($BA2FileSig in $BA2FileTable) {
-                                    # read data lump raw or compressed and write to a file on disk
-                                    Write-Host "Extracting $(Split-Path -Path  $BA2FileSig.FileName -Leaf) ..."
+                                    $packedFilename = Split-Path -Path  $BA2FileSig.FileName -Leaf
 
-                                    [void]$BA2Reader.BaseStream.Seek([long]($BA2FileSig.FileOffset), [System.IO.SeekOrigin]::Begin)
+                                    If ($packedFilename.EndsWith(".xwm")) {
+                                        # read data lump raw or compressed and write to a file on disk
+                                        Write-Host "Extracting $(Split-Path -Path  $BA2FileSig.FileName -Leaf) ..."
 
-                                    If ($BA2FileSig.FileLenCompressed -eq 0) {
-                                        # extract non-compressed
-                                        $datalumpRaw = [System.Byte[]]::new($BA2FileSig.FileLenRaw)
-                                        $datalumpRaw = $BA2Reader.ReadBytes($BA2FileSig.FileLenRaw)
+                                        [void]$BA2Reader.BaseStream.Seek([long]($BA2FileSig.FileOffset), [System.IO.SeekOrigin]::Begin)
 
-                                        If ($datalumpRaw) {
-                                             # dump lump to a disk file (from memory)
-                                            $FSLump = [System.IO.File]::OpenWrite(".\$($BA2ExtractPath)\$(Split-Path -Path $BA2FileSig.FileName -Leaf)")
-                                            $FSLump.Write($datalumpRaw, 0, $datalumpRaw.Length)
-                                            $FSLump.Flush()
-                                            $FSLump.Close()
-                                        }
-                                    } Else {
-                                        # extract compressed
-                                        $datalumpC = [System.Byte[]]::new($BA2FileSig.FileLenCompressed)
-                                        $datalumpC = $BA2Reader.ReadBytes($BA2FileSig.FileLenCompressed)
+                                        If ($BA2FileSig.FileLenCompressed -eq 0) {
+                                            # extract non-compressed
+                                            $datalumpRaw = [System.Byte[]]::new($BA2FileSig.FileLenRaw)
+                                            $datalumpRaw = $BA2Reader.ReadBytes($BA2FileSig.FileLenRaw)
 
-                                        If ($datalumpC) {
-                                            $datalumpRaw = Decompress-BA2Lump -BA2DataLump $datalumpC
-                            
                                             If ($datalumpRaw) {
                                                  # dump lump to a disk file (from memory)
                                                 $FSLump = [System.IO.File]::OpenWrite(".\$($BA2ExtractPath)\$(Split-Path -Path $BA2FileSig.FileName -Leaf)")
-                                                $FSLump.Write($datalumpC, 0, $datalumpC.Length)
+                                                $FSLump.Write($datalumpRaw, 0, $datalumpRaw.Length)
                                                 $FSLump.Flush()
                                                 $FSLump.Close()
                                             }
-                                        }                                        
+                                        } Else {
+                                            # extract compressed
+                                            $datalumpC = [System.Byte[]]::new($BA2FileSig.FileLenCompressed)
+                                            $datalumpC = $BA2Reader.ReadBytes($BA2FileSig.FileLenCompressed)
+
+                                            If ($datalumpC) {
+                                                $datalumpRaw = Decompress-BA2Lump -BA2DataLump $datalumpC
+                            
+                                                If ($datalumpRaw) {
+                                                     # dump lump to a disk file (from memory)
+                                                    $FSLump = [System.IO.File]::OpenWrite(".\$($BA2ExtractPath)\$(Split-Path -Path $BA2FileSig.FileName -Leaf)")
+                                                    $FSLump.Write($datalumpC, 0, $datalumpC.Length)
+                                                    $FSLump.Flush()
+                                                    $FSLump.Close()
+                                                }
+                                            }                                        
+                                        }
+
                                     }
                                 }
                             } Else {
@@ -477,7 +479,7 @@ Function Main {
                     # remove trailing backslash if needed
                     If ($FalloutInstallPath.EndsWith('\')) {
                         $FalloutInstallPath = $FalloutInstallPath.Substring(0, $FalloutInstallPath.Length -1)
-                    }             
+                    }                 
                 }
 
                 "-ExtractDir" {
@@ -518,7 +520,7 @@ Function Main {
 
 
     Write-Host ""
-    Write-Host " --- EXTRACT FALLOUT FILES ---"
+    Write-Host " --- EXTRACT FALLOUT SOUNDS FILES ---"
     Write-Host " Fallout game : $($FalloutGame)"
     Write-Host " Fallout path : $($FalloutInstallPath)"
     Write-Host ""
