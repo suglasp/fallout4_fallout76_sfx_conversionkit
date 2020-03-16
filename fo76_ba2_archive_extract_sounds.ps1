@@ -2,7 +2,8 @@
 #
 # Pieter De Ridder
 # Extract Fallout 76 (Or Fallout 4) Sound files from BA2 archive files
-# 15/03/2020
+# Created : 15/03/2020
+# Updated : 16/06/2020
 #
 # Note : Because I use Powershell and use objects, but not really use OO architecture,
 # i work in each Function with Open en Close file statements. Just to be safe.
@@ -292,7 +293,7 @@ Function Read-BA2FileTable {
 #
 Function Decompress-BA2Lump {
     Param(
-        [byte[]]$BA2DataLump
+        [System.Byte[]]$BA2DataLump
     )
 
     # Init empty var
@@ -360,37 +361,43 @@ Function Extract-BA2Data {
                                     If ($packedFilename.EndsWith(".xwm")) {
                                         # read data lump raw or compressed and write to a file on disk
                                         Write-Host "Extracting $(Split-Path -Path  $BA2FileSig.FileName -Leaf) ..."
-
+                                                                                
+                                        # got to offset in file for extraction of lump data
                                         [void]$BA2Reader.BaseStream.Seek([long]($BA2FileSig.FileOffset), [System.IO.SeekOrigin]::Begin)
 
-                                        If ($BA2FileSig.FileLenCompressed -eq 0) {
-                                            # extract non-compressed
-                                            $datalumpRaw = [System.Byte[]]::new($BA2FileSig.FileLenRaw)
-                                            $datalumpRaw = $BA2Reader.ReadBytes($BA2FileSig.FileLenRaw)
+                                        # compressed length
+                                        [uint32]$LumpLen = $BA2FileSig.FileLenCompressed
 
-                                            If ($datalumpRaw) {
-                                                 # dump lump to a disk file (from memory)
-                                                $FSLump = [System.IO.File]::OpenWrite(".\$($BA2ExtractPath)\$(Split-Path -Path $BA2FileSig.FileName -Leaf)")
-                                                $FSLump.Write($datalumpRaw, 0, $datalumpRaw.Length)
+                                        # check if we need raw length (non-compressed)
+                                        If ($BA2FileSig.FileLenCompressed -eq 0) {
+                                            $LumpLen = $BA2FileSig.FileLenRaw
+                                        }
+
+                                        # construct lump filename
+                                        $LumpFileName = "$($BA2ExtractPath)\$(Split-Path -Path $BA2FileSig.FileName -Leaf)"
+
+                                        # skip lump extraction, if we already extracted the data before
+                                        If (-Not(Test-Path $LumpFileName)) {
+                                            # create byte array to host data
+                                            $LumpData = [System.Byte[]]::new($LumpLen)
+                                            $LumpData = $BA2Reader.ReadBytes($LumpLen)
+                                        
+                                            # decompress data lump if needed
+                                            If ($BA2FileSig.FileLenCompressed -gt 0) {
+                                                $LumpData = Decompress-BA2Lump -BA2DataLump $LumpData
+                                            }
+
+                                            If ($LumpData.Length -gt 0) {
+                                                # dump lump to a disk file (from memory)
+                                                $FSLump = [System.IO.File]::OpenWrite($LumpFileName)
+                                                $FSLump.Write($LumpData, 0, $LumpData.Length)
                                                 $FSLump.Flush()
                                                 $FSLump.Close()
+
+                                                Write-Host "Extracted the data, and written to file $($LumpFileName) !"
                                             }
                                         } Else {
-                                            # extract compressed
-                                            $datalumpC = [System.Byte[]]::new($BA2FileSig.FileLenCompressed)
-                                            $datalumpC = $BA2Reader.ReadBytes($BA2FileSig.FileLenCompressed)
-
-                                            If ($datalumpC) {
-                                                $datalumpRaw = Decompress-BA2Lump -BA2DataLump $datalumpC
-                            
-                                                If ($datalumpRaw) {
-                                                     # dump lump to a disk file (from memory)
-                                                    $FSLump = [System.IO.File]::OpenWrite(".\$($BA2ExtractPath)\$(Split-Path -Path $BA2FileSig.FileName -Leaf)")
-                                                    $FSLump.Write($datalumpC, 0, $datalumpC.Length)
-                                                    $FSLump.Flush()
-                                                    $FSLump.Close()
-                                                }
-                                            }                                        
+                                            Write-Warning "Already extracted the data, skipped!"
                                         }
 
                                     }
