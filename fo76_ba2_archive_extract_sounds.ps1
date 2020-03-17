@@ -3,7 +3,7 @@
 # Pieter De Ridder
 # Extract Fallout 76 (Or Fallout 4) Sound files from BA2 archive files
 # Created : 15/03/2020
-# Updated : 16/06/2020
+# Updated : 17/06/2020
 #
 # Note : Because I use Powershell and use objects, but not really use OO architecture,
 # i work in each Function with Open en Close file statements. Just to be safe.
@@ -11,7 +11,7 @@
 #
 
 
-#Region Load assemblys needed
+#Region Load assemblies needed
 Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
@@ -21,6 +21,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 #Region Global vars
 [int32]$global:BA2HeaderSize = 24
+[string]$global:WorkDir = "$($PSScriptRoot)"
 #EndRegion
 
 
@@ -340,7 +341,7 @@ Function Extract-BA2Data {
                     # skip BA2 header
                     #[void]$BA2Reader.BaseStream.Seek([long]$global:BA2HeaderSize, [System.IO.SeekOrigin]::Begin)
 
-                    $BA2ExtractPath = "$($ExtractDestinationPath)\$(Split-Path -Path $BA2Header.ArchiveFilePath -Leaf)"
+                    [string]$BA2ExtractPath = "$($ExtractDestinationPath)\$(Split-Path -Path $BA2Header.ArchiveFilePath -Leaf)"
 
                     # create extraction folder if needed
                     If (-Not(Test-Path $BA2ExtractPath)) {
@@ -355,12 +356,26 @@ Function Extract-BA2Data {
                             Write-Host ""
                     
                             If ($BA2FileTable.Length -gt 0) {                                                        
-                                ForEach($BA2FileSig in $BA2FileTable) {
-                                    $packedFilename = Split-Path -Path  $BA2FileSig.FileName -Leaf
+                                ForEach($BA2FileSig in $BA2FileTable) {                                    
+                                    $packedFilename = Split-Path -Path $BA2FileSig.FileName -Leaf
+                                    #$packedFolder   = Split-Path -Path $BA2FileSig.FileName -Parent
 
+                                    # extract only sound files
                                     If ($packedFilename.EndsWith(".xwm")) {
+                                        # create subfolders if needed
+                                        [string[]]$packedSubFolders = (Split-Path -Path  $BA2FileSig.FileName -Parent).ToString().Split('\')
+                                        [string]$packedFolderBuildPath = "$($BA2ExtractPath)"
+                                        ForEach($packedFolderName in $packedSubFolders) {
+                                            $packedFolderBuildPath += "\$($packedFolderName)"
+
+                                            If (-Not(Test-Path $packedFolderBuildPath)) {
+                                                New-Item -Path $packedFolderBuildPath -ItemType Directory -Force -ErrorAction SilentlyContinue
+                                            }
+                                        }
+                                        $packedSubFolders = $null
+                                                                                                                    
                                         # read data lump raw or compressed and write to a file on disk
-                                        Write-Host "Extracting $(Split-Path -Path  $BA2FileSig.FileName -Leaf) ..."
+                                        Write-Host "Extracting $($packedFilename) ..."
                                                                                 
                                         # got to offset in file for extraction of lump data
                                         [void]$BA2Reader.BaseStream.Seek([long]($BA2FileSig.FileOffset), [System.IO.SeekOrigin]::Begin)
@@ -374,7 +389,7 @@ Function Extract-BA2Data {
                                         }
 
                                         # construct lump filename
-                                        $LumpFileName = "$($BA2ExtractPath)\$(Split-Path -Path $BA2FileSig.FileName -Leaf)"
+                                        $LumpFileName = "$($packedFolderBuildPath)\$($packedFilename)"
 
                                         # skip lump extraction, if we already extracted the data before
                                         If (-Not(Test-Path $LumpFileName)) {
@@ -394,7 +409,7 @@ Function Extract-BA2Data {
                                                 $FSLump.Flush()
                                                 $FSLump.Close()
 
-                                                Write-Host "Extracted the data, and written to file $($LumpFileName) !"
+                                                Write-Host "Extracted the data, and written to file $($packedFilename) !"
                                             }
                                         } Else {
                                             Write-Warning "Already extracted the data, skipped!"
