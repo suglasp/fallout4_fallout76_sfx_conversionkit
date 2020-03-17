@@ -1,4 +1,4 @@
-Fallout 4 and Fallout 76 sfx and music conversion kit for PC.
+Fallout 4 and Fallout 76 sound (sfx) and music conversion kit for PC.
 
 -----
 Optional update 15/03/2020:
