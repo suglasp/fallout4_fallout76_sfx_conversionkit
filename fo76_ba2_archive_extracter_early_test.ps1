@@ -348,6 +348,10 @@ Function DecompressWrite-BA2Lump {
             $uncompressedZLibStream.Close()
             $uncompressedZLibStream.Dispose()
 
+            #[System.Text.Encoding]$ascii = [System.Text.Encoding]::ASCII
+            #[System.Byte[]]$EncodedDecompressedData = $ascii.GetBytes($decompressedData)
+            #$EncodedDecompressedData = [Convert]::ToBase64String($decompressedData)
+
             # write to file
             $FSLumpFileHnd = [System.IO.File]::OpenWrite($DecompressedFilename)
 
@@ -588,8 +592,6 @@ Function Main {
         }
     }
 
-    # Override path to my local path
-    $FalloutInstallPath = "E:\Bethesda\$($FalloutGame)\Data"
 
     Write-Host ""
     Write-Host " --- EXTRACT FALLOUT FILES ---"
@@ -605,10 +607,10 @@ Function Main {
         # read BA2 Archive Header
         $BA2FileHeader = Read-BA2Header -BA2Filename $BA2File
 
-        # read BA2 Archive Name Table
+        # read BA2 Archive Name Table (not all DX10 Archives seem to contain a NameTable)
         $BA2NameTable = Read-BA2NameTable -BA2Header $BA2FileHeader
 
-        # read BA2 Arcive File signatures
+        # read BA2 Archive File signatures
         $BA2FileTable = Read-BA2FileTable -BA2Header $BA2FileHeader -BA2NameTable $BA2NameTable
 
         # extract the BA2 File archives
