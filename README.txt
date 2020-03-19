@@ -1,13 +1,14 @@
 Fallout 4 and Fallout 76 sound (sfx) and music conversion kit for PC.
 
 -----
-Optional update 15/03/2020:
-I've included a script 'fo76_ba2_archive_extracter_early_test.ps1' that can extract BA2 archive files.
-Currently it works to extract all *.xmp files (= SFX files) from the ba2 archives.
-Compressed files are mostly ZLib or LZ4 compression. I've been testing with ZLib (DeflateStream in .NET),
-but this seems not to correctly decompress those files.
+Optional update 19/03/2020:
+'fo76_ba2_archive_extract_sounds.ps1' is a backport of script 'fo76_ba2_archive_extracter_early_test.ps1'.
+The first one extracts only sound files. The latter extracts all files from a General BA2 Archive type of files.
 
-From the above script, i also created a variant 'fo76_ba2_archive_extract_sounds.ps1' that can extract exclusive the sound files.
+There are 3 formats of BA2 archives:
+GNRL = General Archive  -> supported to unpack
+DX10 = Textures Archive -> unsupported to unpack
+GNMF = PS4 Archive      -> unsupported to unpack
 -----
 
 Steps:
