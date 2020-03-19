@@ -3,7 +3,7 @@
 # Pieter De Ridder
 # Extract Fallout 76 (Or Fallout 4) BA2 archive files
 # Created : 15/03/2020
-# Updated : 17/06/2020
+# Updated : 19/06/2020
 #
 # Currently, the script can only extract BA2 'GNRL' (= General) Archive files.
 # BA2 'DX10' (=DirectX Textures) and 'GNMF' (=PS4) files types are not supported.
@@ -290,32 +290,82 @@ Function Read-BA2FileTable {
 }
 
 
-
 #
-# Function : Decompress-BA2Lump
-# Decompress a byte array using ZLib
+# Function : RawWrite-BA2Lump
+# Write a byte array using raw bytes to file
 #
-Function Decompress-BA2Lump {
+Function RawWrite-BA2Lump {
     Param(
+        [string]$RAWFilename,
         [System.Byte[]]$BA2DataLump
     )
 
+    # dump lump to a disk file (from memory)
+    If ($BA2DataLump.Length -gt 0) {        
+        $FSLumpFileHnd = [System.IO.File]::OpenWrite($RAWFilename)
+
+        If ($FSLumpFileHnd) {
+            $FSLumpFileHnd.Write($BA2DataLump, 0, $BA2DataLump.Length)
+            $FSLumpFileHnd.Flush()
+            $FSLumpFileHnd.Close()
+        }
+
+        Write-Host "Extracted the data, and written to file $($RAWFilename) !"
+    } Else {
+        Write-Warning "Extracted data is empty, not written file $($RAWFilename) !"
+    }
+}
+
+#
+# Function : DecompressWrite-BA2Lump
+# Decompress a byte array using zip/deflate and write to file
+#
+Function DecompressWrite-BA2Lump {
+    Param(
+        [string]$DecompressedFilename,
+        [System.Byte[]]$BA2DataLump,
+        [uint32]$BA2UncompressedLength
+    )
+
     # Init empty var
-    $decompressedZLibSteam = $null
+    [System.Byte[]]$decompressedData = [System.Byte[]]::new($BA2UncompressedLength) 
+    #[System.Byte[]]$decompressedData = New-Object System.Byte[] $BA2UncompressedLength
 
     # Deflate
-    If ($BA2DataLump) {
-        $compressedFileStream = New-Object System.IO.MemoryStream
-        $compressedFileStream.Write($BA2DataLump, 0, $BA2DataLump.Length)
-        [void]$compressedFileStream.Seek(0,0)
+    If ($BA2UncompressedLength -gt 0) {
+        If ($BA2DataLump) {
+            # copy data lump byte array to a MemoryStream
+            [System.IO.MemoryStream]$compressedFileStream = New-Object System.IO.MemoryStream
+            $compressedFileStream.Write($BA2DataLump, 0, $BA2DataLump.Length)
+        
+            # skip ZLib header of 2 bytes in .NET
+            [void]$compressedFileStream.Seek(2, [System.IO.SeekOrigin]::Begin)
 
-        $decompressedZLibSteam = New-Object System.IO.Compression.DeflateStream($compressedFileStream, [System.IO.Compression.CompressionMode]::Decompress)
-    } Else {
-        Write-Warning "BA2 Lump is empty!"
+            # decompress and store
+            #[System.IO.StreamReader]$uncompressedZLibStream = New-Object System.IO.StreamReader(New-Object System.IO.Compression.DeflateStream($compressedFileStream, [System.IO.Compression.CompressionMode]::Decompress))
+            [System.IO.Compression.DeflateStream]$uncompressedZLibStream = New-Object System.IO.Compression.DeflateStream($compressedFileStream, [System.IO.Compression.CompressionMode]::Decompress)
+            [void]$uncompressedZLibStream.Read($decompressedData, 0, $decompressedData.Length)
+            $uncompressedZLibStream.Close()
+            $uncompressedZLibStream.Dispose()
+
+            # write to file
+            $FSLumpFileHnd = [System.IO.File]::OpenWrite($DecompressedFilename)
+
+            if ($FSLumpFileHnd) {
+                $FSLumpFileHnd.Write($decompressedData, 1, $decompressedData.Length -1)
+                $FSLumpFileHnd.Flush()
+                $FSLumpFileHnd.Close()
+            
+                Write-Host "Decompressed the data, and written to file $($DecompressedFilename) !"
+            } Else {
+                Write-Warning "Decompressed data is empty, not written file $($DecompressedFilename) !"
+            }
+        } Else {
+            Write-Warning "BA2 Lump is empty!"
+        }
+    } else {
+        Write-Warning "Uncompressed lump size is zero, skipped!"
     }
-
-    # Return
-    Return $decompressedZLibSteam
 }
 
 #
@@ -381,12 +431,12 @@ Function Extract-BA2Data {
                                     # got to offset in file for extraction of lump data
                                     [void]$BA2Reader.BaseStream.Seek([long]($BA2FileSig.FileOffset), [System.IO.SeekOrigin]::Begin)
 
-                                    # compressed length
-                                    [uint32]$LumpLen = $BA2FileSig.FileLenCompressed
+                                    # default, we set raw length
+                                    [uint32]$LumpLen = $BA2FileSig.FileLenRaw
 
-                                    # check if we need raw length (non-compressed)
-                                    If ($BA2FileSig.FileLenCompressed -eq 0) {
-                                        $LumpLen = $BA2FileSig.FileLenRaw
+                                    # check if we need compressed
+                                    If ($BA2FileSig.FileLenCompressed -gt 0) {
+                                        $LumpLen = $BA2FileSig.FileLenCompressed
                                     }
 
                                     # construct lump filename
@@ -400,18 +450,17 @@ Function Extract-BA2Data {
                                         
                                         # decompress data lump if needed
                                         If ($BA2FileSig.FileLenCompressed -gt 0) {
-                                            $LumpData = Decompress-BA2Lump -BA2DataLump $LumpData
+                                            # decompress and write lump data
+                                            DecompressWrite-BA2Lump -DecompressedFilename $LumpFileName -BA2DataLump $LumpData -BA2UncompressedLength $BA2FileSig.FileLenRaw
+                                            #[System.Byte[]]$LumpDataTemp = Decompress-BA2Lump -BA2DataLump $LumpData -BA2UncompressedLength $BA2FileSig.FileLenRaw
+                                            #$LumpDataTemp | Get-Member
+                                            #Write-Host "Len : $($LumpDataTemp.Length)"
+                                            #$LumpDataTemp.CopyTo($LumpData)                                                                                                                                                               
+                                        } Else {
+                                            # write raw lump data
+                                            RawWrite-BA2Lump  -RAWFilename $LumpFileName -BA2DataLump $LumpData
                                         }
 
-                                        If ($LumpData.Length -gt 0) {
-                                            # dump lump to a disk file (from memory)
-                                            $FSLump = [System.IO.File]::OpenWrite($LumpFileName)
-                                            $FSLump.Write($LumpData, 0, $LumpData.Length)
-                                            $FSLump.Flush()
-                                            $FSLump.Close()
-
-                                            Write-Host "Extracted the data, and written to file $($packedFilename) !"
-                                        }
                                     } Else {
                                         Write-Warning "Already extracted the data, skipped!"
                                     }
@@ -538,6 +587,9 @@ Function Main {
             $FalloutInstallPath = "$($env:ProgramFiles)\Steam\steamapps\common\$($FalloutGame)\Data"
         }
     }
+
+    # Override path to my local path
+    $FalloutInstallPath = "E:\Bethesda\$($FalloutGame)\Data"
 
     Write-Host ""
     Write-Host " --- EXTRACT FALLOUT FILES ---"
