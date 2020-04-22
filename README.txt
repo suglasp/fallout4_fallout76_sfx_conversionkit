@@ -9,6 +9,10 @@ There are 3 formats of BA2 archives:
 GNRL = General Archive  -> supported to unpack
 DX10 = Textures Archive -> unsupported to unpack
 GNMF = PS4 Archive      -> unsupported to unpack
+
+Update 22/04/2020:
+Since Wastelanders update for Fallout 76, the "SeventySix - Voices" BA2 files does not contain xmp formats anymore,
+but the Skyrim fuz format.
 -----
 
 Steps:
