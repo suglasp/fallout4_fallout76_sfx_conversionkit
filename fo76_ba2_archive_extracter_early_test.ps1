@@ -523,12 +523,12 @@ Function Extract-BA2Data {
 Function Main {
 
     Param (
-        $Arguments
+        [string[]]$Arguments
     )
 
-    [string]$FalloutGame        = "Fallout76"        # change this to Fallout4 or Fallout76
-    [string]$FalloutInstallPath = ""                 # internal var for installation path
-    [string]$MyExtractionFolder = ".\extracted_sfx" # extraction folder
+    [string]$FalloutGame        = "Fallout76"                       # change this to Fallout4 or Fallout76
+    [string]$FalloutInstallPath = ""                                # internal var for installation path
+    [string]$MyExtractionFolder = "$($PSScriptRoot)\extracted_sfx"  # extraction folder
 
     # logic for cmdline arguments
     If ($Arguments) {
