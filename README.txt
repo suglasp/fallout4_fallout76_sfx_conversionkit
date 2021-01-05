@@ -55,14 +55,14 @@ fo76_ba2_archive_extract_sounds.ps1 [-InstallPath <fallout4_fallout76_installpat
 Open powershell and run .\fo76_ba2_archive_extract_sounds.ps1.
 
 Default, the script will search in the Steam or Bethesda Launcher installation folders.
-If you installed FO4 of FO76 in a custom path, use the flag .fo76_ba2_archive_extract_sounds.ps1 -InstallPath <path>
+If you installed FO4 of FO76 in a custom path, use the flag .\fo76_ba2_archive_extract_sounds.ps1 -InstallPath <path>
 The script above will search all *.ba2 files, and will start extracting all xmp files automatically.
 
 Default, the script will target Fallout76. If you want Fallout 4,
-then use the flag .fo76_ba2_archive_extract_sounds.ps1 -Fallout "Fallout4"
+then use the flag .\fo76_ba2_archive_extract_sounds.ps1 -Fallout "Fallout4"
 
 Default, the script will create extract folder "extracted_sfx" in the folder where it is ran.
-If you want to change the extraction path, use the flag .fo76_ba2_archive_extract_sounds.ps1 -ExtractDir "<path to folder>"
+If you want to change the extraction path, use the flag .\fo76_ba2_archive_extract_sounds.ps1 -ExtractDir "<path to folder>"
 
 
 For your information, the files of interest are for each Fallout[4|76] game in the <install folder>\Data.
@@ -72,7 +72,7 @@ For FO76, you want mainly these files for sfx/music extraction:
 - SeventySix - Sounds02.ba2
 - SeventySix - Voices.ba2
 - SeventySix - Startup.ba2
-- SeventySix - ??UpdateStream.ba2  (Where ?? is a double number from 00, 01, 02 to .. for each update)
+- SeventySix - ??UpdateStream.ba2  (Where ?? is a double number from 00, 01, 02 to .. for each Fallout 76 released Bethesda patch)
 
 For FO4, you want these files for sfx/music:
 - Fallout4 - Sounds.ba2
