@@ -28,8 +28,9 @@ Update 05/01/2020:
 >> In high level overview, these are the steps we do:
 - Search inside the ba2 Fallout archive files for xmp (or now more recent also fuz) files.
 - Extract these files and write to disk.
-- Run a second tool to convert the xmp files to RIFF (wav files).
-- Run a third tool to convert the wav files to mp3.
+- Run a second tool to convert the fuz files to xmp.
+- Run a third tool to convert the xmp files to RIFF (wav files).
+- Run a fourth tool to convert the wav files to mp3.
 
 ----
 
@@ -82,14 +83,17 @@ Step 2)  -> prepare for conversion of xmp files to wav/mp3
 Copy convert_wav_to_mp3.ps1 and convert_xwm_to_wav.ps1 to the extract folder.
 Make a subfolder "ffmpeg"
 Make a subfolder "xWMAEncode"
+Make a subfolder "fuze"
 
-Download xWMAEncode.exe to the folder "xWMAEncode" from https://www.nexusmods.com/skyrim/mods/32075/?tab=files
-Download ffmpeg static compiled for Windows to "ffmpeg" from https://ffmpeg.org/download.html#build-windows
+Download BmlFuzDecode.exe to the folder "fuze" from https://www.nexusmods.com/skyrim/mods/73100/ (download BmlFuzTools and extract the zip file. Copy *.exe files to "fuze" folder).
+Download xWMAEncode.exe to the folder "xWMAEncode" from https://www.nexusmods.com/skyrim/mods/32075/?tab=files and extract to folder "xWMAEncode".
+Download ffmpeg static compiled for Windows to "ffmpeg" from https://ffmpeg.org/download.html#build-windows and extract to folder "ffmpeg".
 
 
 Step 3)  -> follow each step as described. This will generate a lot of Gigabytes of data!
 Start powershell
 Set-Location <path_of_ExtractDir> (see above with fo76_ba2_archive_extract_sounds.ps1)
+.\convert_fuz_to_xmp.ps1    <- this converts all *.fuz to *.xmp files (raw)
 .\convert_xwm_to_wav.ps1    <- this converts all *.xmp to *.wav files (raw)
 .\convert_wav_to_mp3.ps1    <- this converts all *.wav to *.mp3 files (compressed)
 
