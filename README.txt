@@ -22,6 +22,7 @@ Update 05/01/2020:
 - Arguments datatype is now pre-defined as string array
 - extract path used a dot notation (Powershell), changed this so the script fill's in full path. Extract would fail to the Windows System folder when ran with a standard powershell startup shell.
 - Now extracts the fuz files and xmp files
+- Added new script convert_fuz_to_xmp.ps1 to convert fuz to xmp files.
 
 -----
 
