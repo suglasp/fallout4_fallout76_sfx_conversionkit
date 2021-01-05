@@ -84,7 +84,7 @@ Make a subfolder "ffmpeg"
 Make a subfolder "xWMAEncode"
 
 Download xWMAEncode.exe to the folder "xWMAEncode" from https://www.nexusmods.com/skyrim/mods/32075/?tab=files
-Download ffmpeg static compiled for Windows to "ffmpeg" from https://ffmpeg.zeranoe.com/builds/
+Download ffmpeg static compiled for Windows to "ffmpeg" from https://ffmpeg.org/download.html#build-windows
 
 
 Step 3)  -> follow each step as described. This will generate a lot of Gigabytes of data!
