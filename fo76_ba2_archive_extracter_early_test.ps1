@@ -593,7 +593,7 @@ Function Main {
     }
 
     # Override path to my local path
-    $FalloutInstallPath = "E:\Bethesda\$($FalloutGame)\Data"
+    #$FalloutInstallPath = "E:\Bethesda\$($FalloutGame)\Data"
 
     Write-Host ""
     Write-Host " --- EXTRACT FALLOUT FILES ---"

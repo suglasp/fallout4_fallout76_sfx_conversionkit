@@ -417,7 +417,7 @@ Function Extract-BA2Data {
                                     #$packedFolder   = Split-Path -Path $BA2FileSig.FileName -Parent
 
                                     # extract only sound files
-                                    If ($packedFilename.EndsWith(".xwm")) {
+                                    If ($packedFilename.EndsWith(".xwm") -or $packedFilename.EndsWith(".fuz")) {
                                         # create subfolders if needed
                                         [string[]]$packedSubFolders = (Split-Path -Path  $BA2FileSig.FileName -Parent).ToString().Split('\')
                                         [string]$packedFolderBuildPath = "$($BA2ExtractPath)"
@@ -592,7 +592,7 @@ Function Main {
 
 
     # Override path to my local path
-    $FalloutInstallPath = "E:\Bethesda\$($FalloutGame)\Data"
+    #$FalloutInstallPath = "E:\Bethesda\$($FalloutGame)\Data"
 
     Write-Host ""
     Write-Host " --- EXTRACT FALLOUT SOUNDS FILES ---"
