@@ -3,7 +3,7 @@
 # Pieter De Ridder
 # Extract Fallout 76 (Or Fallout 4) BA2 archive files
 # Created : 15/03/2020
-# Updated : 19/06/2020
+# Updated : 05/01/2021
 #
 # Currently, the script can only extract BA2 'GNRL' (= General) Archive files.
 # BA2 'DX10' (=DirectX Textures) and 'GNMF' (=PS4) files types are not supported.
@@ -592,6 +592,8 @@ Function Main {
         }
     }
 
+    # Override path to my local path
+    $FalloutInstallPath = "E:\Bethesda\$($FalloutGame)\Data"
 
     Write-Host ""
     Write-Host " --- EXTRACT FALLOUT FILES ---"
@@ -624,4 +626,4 @@ Function Main {
 
 
 # --- MAIN ---
-Main
+Main -Arguments $args

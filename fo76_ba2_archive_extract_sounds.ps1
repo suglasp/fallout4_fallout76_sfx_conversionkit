@@ -3,7 +3,7 @@
 # Pieter De Ridder
 # Extract Fallout 76 (Or Fallout 4) Sound files from BA2 archive files
 # Created : 15/03/2020
-# Updated : 19/06/2020
+# Updated : 05/01/2021
 #
 # Note : Because I use Powershell and use objects, but not really use OO architecture,
 # i work in each Function with Open en Close file statements. Just to be safe.
@@ -591,6 +591,9 @@ Function Main {
     }
 
 
+    # Override path to my local path
+    $FalloutInstallPath = "E:\Bethesda\$($FalloutGame)\Data"
+
     Write-Host ""
     Write-Host " --- EXTRACT FALLOUT SOUNDS FILES ---"
     Write-Host " Fallout game : $($FalloutGame)"
@@ -622,4 +625,4 @@ Function Main {
 
 
 # --- MAIN ---
-Main
+Main -Arguments $args
