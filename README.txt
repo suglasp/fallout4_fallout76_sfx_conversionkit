@@ -13,6 +13,9 @@ GNMF = PS4 Archive      -> unsupported to unpack
 Update 22/04/2020:
 Since Wastelanders update for Fallout 76, the "SeventySix - Voices" BA2 files does not contain xmp formats anymore,
 but the Skyrim fuz format.
+
+Update 05/01/2020:
+Made some small fixes to the script.
 -----
 
 Steps:
