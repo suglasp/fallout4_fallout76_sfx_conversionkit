@@ -22,8 +22,8 @@ Function Convert-ToMP3 {
         [string]$WAVFile
     )
 
-    If (Test-Path $global:ffmpeg) {
-        If (Test-Path $WAVFile) {
+    If (Test-Path -Path $global:ffmpeg) {
+        If (Test-Path -Path $WAVFile) {
             If ($WAVFile.EndsWith(".wav")) {
                 $sOutputPath = Split-Path $WAVFile -Parent
 
@@ -33,31 +33,47 @@ Function Convert-ToMP3 {
                 $sOutput = "$($sOutputPath)\$($sOutputFile)"
 
                 If (-not (Test-Path $sOutput)) {
-                    $arrArgs = @()
-                    $arrArgs += "-i" 
-                    $arrArgs += "$([char]34)$($WAVFile)$([char]34)"
-                    $arrArgs += "-vn" 
-                    $arrArgs += "-ar" 
-                    $arrArgs += "44100" 
-                    $arrArgs += "-ac"
-                    $arrArgs += "2"
-                    $arrArgs += "-b:a"
-                    $arrArgs += "192k"
-                    $arrArgs += "$([char]34)$($sOutput)$([char]34)"
+                    $sProcArgs = "-i $([char]34)$($WAVFile)$([char]34) -vn -ar 44100 -ac 2 -b:4 192k $([char]34)$($sOutput)$([char]34)" 
+                    #$arrProcArgs = @()
+                    #$arrProcArgs += "-i" 
+                    #$arrProcArgs += "$([char]34)$($WAVFile)$([char]34)"
+                    #$arrProcArgs += "-vn" 
+                    #$arrProcArgs += "-ar" 
+                    #$arrProcArgs += "44100" 
+                    #$arrProcArgs += "-ac"
+                    #$arrProcArgs += "2"
+                    #$arrProcArgs += "-b:a"
+                    #$arrProcArgs += "192k"
+                    #$arrProcArgs += "$([char]34)$($sOutput)$([char]34)"
 
                     Write-Host "Generating $($sOutputFile)..."
-                    $p = Start-Process -FilePath $global:ffmpeg -WorkingDirectory $global:WorkingDirFFMPEG -ArgumentList $arrArgs -NoNewWindow -Wait -PassThru
-                
+                    #$p = Start-Process -FilePath $global:ffmpeg -WorkingDirectory $global:WorkingDirFFMPEG -ArgumentList $arrProcArgs -NoNewWindow -Wait -PassThru
+                    
+                    $pinfo = New-Object System.Diagnostics.ProcessStartInfo
+                    $pinfo.FileName = $global:xWMAEnc
+                    $pinfo.CreateNoWindow = $true
+                    $pinfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+                    $pinfo.RedirectStandardError = $true
+                    $pinfo.RedirectStandardOutput = $true
+                    $pinfo.UseShellExecute = $false
+                    $pinfo.Arguments = $sProcArgs
+                    $p = New-Object System.Diagnostics.Process
+                    $p.StartInfo = $pinfo
+
+                    $p.Start() | Out-Null
+                    $p.PriorityClass = [System.Diagnostics.ProcessPriorityClass]::High
+                    $p.WaitForExit()
+
                     if ($p.ExitCode -eq 0) {
                         Write-Warning "ffmpeg : success"
                     } else {
-                        Write-Warning "ffmpeg : failed?"
+                        Write-Warning "ffmpeg : failed? [Exitcode $($p.ExitCode)]"
                     }
                 } else {
-                    Write-Warning "$($sOutput) already exists."
+                    Write-Warning "$([char]34)$($sOutput)$([char]34) already exists."
                 }
             } else {
-                Write-Warning "$($WAVFile) not a wav file?"
+                Write-Warning "$([char]34)$($WAVFile)$([char]34) not a wav file?"
             }
         }
     } else {

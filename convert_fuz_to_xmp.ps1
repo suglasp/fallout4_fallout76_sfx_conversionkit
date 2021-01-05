@@ -22,8 +22,8 @@ Function Convert-ToFuz {
         [string]$FuzFile
     )
 
-    If (Test-Path $global:FuzDecode) {
-        If (Test-Path $FuzFile) {
+    If (Test-Path -Path $global:FuzDecode) {
+        If (Test-Path -Path $FuzFile) {
             If ($FuzFile.EndsWith(".fuz")) {
                 $sOutputPath = Split-Path $FuzFile -Parent
 
@@ -33,23 +33,39 @@ Function Convert-ToFuz {
                 $sOutput = "$($sOutputPath)\$($sOutputFile)"
 
                 If (-not (Test-Path $sOutput)) {
-                    $arrArgs = @()
-                    $arrArgs += "$([char]34)$($FuzFile)$([char]34)"
-                    $arrArgs += "$([char]34)$($sOutput)$([char]34)"
+                    $sProcArgs = "$([char]34)$($FuzFile)$([char]34) $([char]34)$($sOutput)$([char]34)"
+                    #$arrProcArgs = @()
+                    #$arrProcArgs += "$([char]34)$($FuzFile)$([char]34)"
+                    #$arrProcArgs += "$([char]34)$($sOutput)$([char]34)"
 
                     Write-Host "Generating $($sOutputFile)..."
-                    $p = Start-Process -FilePath $global:FuzDecode -WorkingDirectory $global:WorkingDirFuzDecode -ArgumentList $arrArgs -NoNewWindow -Wait -PassThru
-                
+                    #$p = Start-Process -FilePath $global:FuzDecode -WorkingDirectory $global:WorkingDirFuzDecode -ArgumentList $arrProcArgs -NoNewWindow -Wait -PassThru
+
+                    $pinfo = New-Object System.Diagnostics.ProcessStartInfo
+                    $pinfo.FileName = $global:FuzDecode
+                    $pinfo.CreateNoWindow = $true
+                    $pinfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+                    $pinfo.RedirectStandardError = $true
+                    $pinfo.RedirectStandardOutput = $true
+                    $pinfo.UseShellExecute = $false
+                    $pinfo.Arguments = $sProcArgs
+                    $p = New-Object System.Diagnostics.Process
+                    $p.StartInfo = $pinfo
+
+                    $p.Start() | Out-Null
+                    $p.PriorityClass = [System.Diagnostics.ProcessPriorityClass]::High
+                    $p.WaitForExit()
+
                     if ($p.ExitCode -eq 0) {
                         Write-Warning "Fuze Decode : success"
                     } else {
-                        Write-Warning "Fuze Decode : failed?"
+                        Write-Warning "Fuze Decode : failed? [Exitcode $($p.ExitCode)]"
                     }
                 } else {
-                    Write-Warning "$($sOutput) already exists."
+                    Write-Warning "$([char]34)$($sOutput)$([char]34) already exists."
                 }
             } else {
-                Write-Warning "$($FuzFile) not a fuze file?"
+                Write-Warning "$([char]34)$($FuzFile)$([char]34) not a fuze file?"
             }
         }
     } else {

@@ -22,8 +22,8 @@ Function Convert-ToWav {
         [string]$XwmFile
     )
 
-    If (Test-Path $global:xWMAEnc) {
-        If (Test-Path $XwmFile) {
+    If (Test-Path -Path $global:xWMAEnc) {
+        If (Test-Path -Path $XwmFile) {
             If ($XwmFile.EndsWith(".xwm")) {
                 $sOutputPath = Split-Path $XwmFile -Parent
 
@@ -33,23 +33,39 @@ Function Convert-ToWav {
                 $sOutput = "$($sOutputPath)\$($sOutputFile)"
 
                 If (-not (Test-Path $sOutput)) {
-                    $arrArgs = @()
-                    $arrArgs += "$([char]34)$($XwmFile)$([char]34)"
-                    $arrArgs += "$([char]34)$($sOutput)$([char]34)"
+                    $sProcArgs = "$([char]34)$($XwmFile)$([char]34) $([char]34)$($sOutput)$([char]34)"
+                    #$arrProcArgs = @()
+                    #$arrProcArgs += "$([char]34)$($XwmFile)$([char]34)"
+                    #$arrProcArgs += "$([char]34)$($sOutput)$([char]34)"
 
                     Write-Host "Generating $($sOutputFile)..."
-                    $p = Start-Process -FilePath $global:xWMAEnc -WorkingDirectory $global:WorkingDirxWMAEnc -ArgumentList $arrArgs -NoNewWindow -Wait -PassThru
-                
+                    #$p = Start-Process -FilePath $global:xWMAEnc -WorkingDirectory $global:WorkingDirxWMAEnc -ArgumentList $arrArgs -NoNewWindow -Wait -PassThru
+                    
+                    $pinfo = New-Object System.Diagnostics.ProcessStartInfo
+                    $pinfo.FileName = $global:xWMAEnc
+                    $pinfo.CreateNoWindow = $true
+                    $pinfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+                    $pinfo.RedirectStandardError = $true
+                    $pinfo.RedirectStandardOutput = $true
+                    $pinfo.UseShellExecute = $false
+                    $pinfo.Arguments = $sProcArgs
+                    $p = New-Object System.Diagnostics.Process
+                    $p.StartInfo = $pinfo
+
+                    $p.Start() | Out-Null
+                    $p.PriorityClass = [System.Diagnostics.ProcessPriorityClass]::High
+                    $p.WaitForExit()
+
                     if ($p.ExitCode -eq 0) {
                         Write-Warning "xWMAEnc : success"
                     } else {
-                        Write-Warning "xWMAEnc : failed?"
+                        Write-Warning "xWMAEnc : failed? [Exitcode $($p.ExitCode)]"
                     }
                 } else {
-                    Write-Warning "$($sOutput) already exists."
+                    Write-Warning "$([char]34)$($sOutput)$([char]34) already exists."
                 }
             } else {
-                Write-Warning "$($XwmFile) not a xwm file?"
+                Write-Warning "$([char]34)$($XwmFile)$([char]34) not a xwm file?"
             }
         }
     } else {
