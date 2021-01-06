@@ -3,7 +3,7 @@
 # Pieter De Ridder
 # Extract Fallout 76 (Or Fallout 4) BA2 archive files
 # Created : 15/03/2020
-# Updated : 05/01/2021
+# Updated : 06/01/2021
 #
 # Currently, the script can only extract BA2 'GNRL' (= General) Archive files.
 # BA2 'DX10' (=DirectX Textures) and 'GNMF' (=PS4) files types are not supported.
@@ -11,6 +11,9 @@
 # Note : Because I use Powershell and use objects, but not really use OO architecture,
 # i work in each Function with Open en Close file statements. Just to be safe.
 # You can call this way any Function and it will handle the archive files in a safe manner.
+#
+# Usage:
+# .\fo76_ba2_archive_extracter_early_test.ps1 [-InstallPath <fallout4_fallout76_installpath>] [-Fallout "Fallout4"|"Fallout76"] [-ExtractDir <extract_dir>]
 #
 
 
@@ -533,7 +536,7 @@ Function Main {
     # logic for cmdline arguments
     If ($Arguments) {
         for($i = 0; $i -lt $Arguments.Length; $i++) {
-            #Write-Host "DEBUG : Arg $($i.ToString()) is $($args[$i])"
+            #Write-Host "DEBUG : Arg $($i.ToString()) is $($Arguments[$i])"
 
             # default, a PWSH Switch statement on a String is always case insenstive
             Switch ($Arguments[$i]) {

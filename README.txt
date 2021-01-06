@@ -26,6 +26,11 @@ Update 05/01/2020:
 - Added new script convert_fuz_to_xmp.ps1 to convert fuz to xmp files.
 - Convert scripts now start conversion tools with High priority, for faster processing.
 
+Update 06/01/2020:
+- Convert scripts now support a custom path through the parameter -CustomDir <dir>
+- Script "convert_wav_to_mp3.ps1" got a bug that didn't trigger ffmpeg.exe
+- Updated comments in scripts with info how to run scripts and optional parameters.
+
 -----
 
 >> In high level overview, these are the steps we do:
@@ -51,7 +56,7 @@ Step 1) -> this takes the longest. This will generate a lot of Gigabytes of data
 Download the Extraction tool here https://github.com/suglasp/fo4_fo76_sfx_conversionkit/fo76_ba2_archive_extract_sounds.ps1    ( or download the B.E.A. Tool https://www.nexusmods.com/fallout4/mods/78/? )
 
 Parameters (optional):
-fo76_ba2_archive_extract_sounds.ps1 [-InstallPath <fallout4_fallout76_installpath>] [-Fallout "Fallout4"] [-ExtractDir <extract_dir>]
+fo76_ba2_archive_extract_sounds.ps1 [-InstallPath <fallout4_fallout76_installpath>] [-Fallout "Fallout4"|"Fallout76"] [-ExtractDir <extract_dir>]
 
 
 Open powershell and run .\fo76_ba2_archive_extract_sounds.ps1.
@@ -100,6 +105,9 @@ Set-Location <path_of_ExtractDir> (see above with fo76_ba2_archive_extract_sound
 .\convert_fuz_to_xmp.ps1    <- this converts all *.fuz to *.xmp files (raw)
 .\convert_xwm_to_wav.ps1    <- this converts all *.xmp to *.wav files (raw)
 .\convert_wav_to_mp3.ps1    <- this converts all *.wav to *.mp3 files (compressed)
+
+Parameters (optional):
+convert_XXX_to_XXX.ps1 [-CustomDir <custom_path_dir>]
 
 
 Have fun,

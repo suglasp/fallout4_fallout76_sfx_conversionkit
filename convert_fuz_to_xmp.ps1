@@ -3,7 +3,10 @@
 # Pieter De Ridder
 # Script to convert fuz (Skyrim Fuze) to xmp (xWMA) in a loop
 # created : 05/01/2021
-# updated : 05/01/2021
+# updated : 06/01/2021
+#
+# Usage:
+# .\convert_fuz_to_xmp.ps1 [-CustomDir <custom_path_directory>]
 #
 
 # Global vars
@@ -43,15 +46,16 @@ Function Convert-ToFuz {
 
                     $pinfo = New-Object System.Diagnostics.ProcessStartInfo
                     $pinfo.FileName = $global:FuzDecode
+                    $pinfo.WorkingDirectory = $global:WorkingDirFuzDecode
+                    $pinfo.Arguments = $sProcArgs
                     $pinfo.CreateNoWindow = $true
                     $pinfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
                     $pinfo.RedirectStandardError = $true
                     $pinfo.RedirectStandardOutput = $true
                     $pinfo.UseShellExecute = $false
-                    $pinfo.Arguments = $sProcArgs
+
                     $p = New-Object System.Diagnostics.Process
                     $p.StartInfo = $pinfo
-
                     $p.Start() | Out-Null
                     $p.PriorityClass = [System.Diagnostics.ProcessPriorityClass]::High
                     $p.WaitForExit()
@@ -102,9 +106,51 @@ Function Convert-FuzBulk  {
     }
 }
 
+
+#
+# Function : Main
+# Main function
 #
 # convert all fuz (Skyrim Fuze files) files in folder 'in-place' to xmp files.
 # .fuz files get converted, serial wise a.k.a. synchronious, to .xmp.
 # the output xmp file is placed next to the existing fuz file.
 #
-Convert-FuzBulk -Root ".\extracted_sfx"
+Function Main {
+
+    Param (
+        [string[]]$Arguments
+    )
+
+    [string]$MyExtractionFolder = "$($PSScriptRoot)\extracted_sfx"  # extraction folder
+     
+    # logic for cmdline arguments
+    If ($Arguments) {
+        for($i = 0; $i -lt $Arguments.Length; $i++) {
+            #Write-Host "DEBUG : Arg $($i.ToString()) is $($Arguments[$i])"
+
+            # default, a PWSH Switch statement on a String is always case insenstive
+            Switch ($Arguments[$i]) {
+                "-CustomDir" {
+                    # manually override extraction folder
+                    If (($i +1) -le $Arguments.Length) {
+                        $MyExtractionFolder = $Arguments[$i +1]
+                    }
+
+                    # remove trailing backslash if needed
+                    If ($MyExtractionFolder.EndsWith('\')) {
+                        $MyExtractionFolder = $MyExtractionFolder.Substring(0, $MyExtractionFolder.Length -1)
+                    }
+                }
+            }             
+        }
+    }
+
+    Convert-FuzBulk -Root $MyExtractionFolder
+
+    Exit(0)
+}
+
+
+
+# --- MAIN ---
+Main -Arguments $args
