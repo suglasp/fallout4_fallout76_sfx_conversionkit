@@ -96,7 +96,9 @@ Make a subfolder "fuze"
 
 Download BmlFuzDecode.exe to the folder "fuze" from https://www.nexusmods.com/skyrim/mods/73100/ (download BmlFuzTools and extract the zip file. Copy *.exe files to "fuze" folder).
 Download xWMAEncode.exe to the folder "xWMAEncode" from https://www.nexusmods.com/skyrim/mods/32075/?tab=files and extract to folder "xWMAEncode".
-Download ffmpeg static compiled for Windows to "ffmpeg" from https://ffmpeg.org/download.html#build-windows and extract to folder "ffmpeg".
+Download ffmpeg static compiled for Windows to "ffmpeg" from https://ffmpeg.org/download.html#build-windows and extract to folder "ffmpeg". (*)
+
+(*) Inside the "ffmpeg" folder, there needs to be a "bin" folder (so, ..\ffmpeg\bin) where you put the ffmpeg.exe file.
 
 
 Step 3)  -> follow each step as described. This will generate a lot of Gigabytes of data!
