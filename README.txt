@@ -68,11 +68,11 @@ The script above will search all *.ba2 files, and will start extracting all *.xm
 Default, the script will target 'Fallout76'. If you want Fallout 4,
 then use the flag .\fo76_ba2_archive_extract_sounds.ps1 -Fallout "Fallout4".
 
-Default, the script will create extract folder "extracted_sfx" in the folder where it is ran.
-If you want to change the extraction path, use the flag .\fo76_ba2_archive_extract_sounds.ps1 -ExtractDir "<path to folder>"
+Default, the script will create a subfolder "extracted_sfx" in the folder where it is ran.
+If you want to change the extraction path, use the flag .\fo76_ba2_archive_extract_sounds.ps1 -ExtractDir "<full path to folder>"
 
 
-For your information, the files of interest are for each Fallout[4|76] game in the <install folder>\Data.
+For your information, the files of interest are for each Fallout[4|76] game in the "<game install folder>\Data".
 
 For FO76, you want mainly these files for sfx/music extraction:
 - SeventySix - Sounds01.ba2
@@ -84,12 +84,12 @@ For FO76, you want mainly these files for sfx/music extraction:
 For FO4, you want these files for sfx/music:
 - Fallout4 - Sounds.ba2
 
-The extract script will locate these automatically.
+The extract script will locate the archive files automatically.
 When running the script, it will index all *.ba2 files and start extracting all files.
 
 
 Step 2)  -> prepare for conversion of xmp files to wav/mp3
-Copy convert_wav_to_mp3.ps1 and convert_xwm_to_wav.ps1 to the extract folder.
+Copy convert_wav_to_mp3.ps1, convert_fuz_to_xmp.ps1 and convert_xwm_to_wav.ps1 to the extract folder.
 Make a subfolder "ffmpeg"
 Make a subfolder "xWMAEncode"
 Make a subfolder "fuze"
