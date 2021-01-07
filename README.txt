@@ -33,6 +33,7 @@ Update 06/01/2020:
 
 Update 07/01/2020:
 - The sfx extract script, fo76_ba2_archive_extract_sounds.ps1, will now auto include <Fallout install path>\Data when a custom path is entered.
+- added -help parameter for cli help
 
 -----
 
@@ -41,7 +42,7 @@ Update 07/01/2020:
 - Extract these files and write to disk.
 - Run a second tool to convert the *.fuz files to *.xwm.
 - Run a third tool to convert the *.xwm files to RIFF (wav files).
-- Run a fourth tool to convert the *.wav files to mp3.
+- Run a fourth tool to convert the *.wav files to mp3. [optional]
 
 ----
 
@@ -109,10 +110,10 @@ Start powershell
 Set-Location <path_of_ExtractDir> (see above with fo76_ba2_archive_extract_sounds.ps1)
 .\convert_fuz_to_xwm.ps1    <- this converts all *.fuz to *.xwm files (raw)
 .\convert_xwm_to_wav.ps1    <- this converts all *.xwm to *.wav files (raw)
-.\convert_wav_to_mp3.ps1    <- this converts all *.wav to *.mp3 files (compressed)
+.\convert_wav_to_mp3.ps1    <- this converts all *.wav to *.mp3 files (compressed)  [optional]
 
 Parameters (optional):
-convert_XXX_to_XXX.ps1 [-CustomDir <custom_path_dir>]
+.\convert_XXX_to_XXX.ps1 [-CustomDir <custom_path_dir>]
 
 
 Have fun,
