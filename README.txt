@@ -31,6 +31,9 @@ Update 06/01/2020:
 - Script "convert_wav_to_mp3.ps1" got a bug that didn't trigger ffmpeg.exe
 - Updated comments in scripts with info how to run scripts and optional parameters.
 
+Update 07/01/2020:
+- The sfx extract script, fo76_ba2_archive_extract_sounds.ps1, will now auto include <Fallout install path>\Data when a custom path is entered.
+
 -----
 
 >> In high level overview, these are the steps we do:

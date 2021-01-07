@@ -3,14 +3,14 @@
 # Pieter De Ridder
 # Extract Fallout 76 (Or Fallout 4) Sound files from BA2 archive files
 # Created : 15/03/2020
-# Updated : 06/01/2021
+# Updated : 07/01/2021
 #
 # Note : Because I use Powershell and use objects, but not really use OO architecture,
 # i work in each Function with Open en Close file statements. Just to be safe.
 # You can call this way any Function and it will handle the archive files in a safe manner.
 #
 # Usage:
-# .\fo76_ba2_archive_extract_sounds.ps1 [-InstallPath <fallout4_fallout76_installpath>] [-Fallout "Fallout4"|"Fallout76"] [-ExtractDir <extract_dir>]
+# .\fo76_ba2_archive_extract_sounds.ps1 [-InstallPath <fallout4_fallout76_installpath>] [-Fallout "Fallout4"|"Fallout76"] [-ExtractDir <extract_dir>] [-Help]
 #
 
 
@@ -29,6 +29,19 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 
 #Region Functions
+#
+# Function : Show-FOHelp
+# show Cli help
+#
+Function Show-FOHelp {
+    Write-Host ""
+    Write-Host "Usage:"
+    Write-Host ".\$(Split-Path -Path $MyInvocation.ScriptName -Leaf) [-InstallPath <fallout4_fallout76_installpath>] [-Fallout $([char](34))Fallout4|Fallout76] [-ExtractDir <extract_dir>] [-Help]"
+    Write-Host ""
+    Exit(0)
+}
+
+
 #
 # Function : Get-BA2FileList
 # Get list of BA2 archives from a folder path.
@@ -568,14 +581,21 @@ Function Main {
                         $MyExtractionFolder = $MyExtractionFolder.Substring(0, $MyExtractionFolder.Length -1)
                     }
                 }
-            }                        
+
+                "-Help" {
+                    # show Cli help
+                    Show-FOHelp
+                }
+            }
         }
     }
 
-    # Hunt down paths if not set by user
+    $FalloutInstallPath
+
+    # Hunt down default paths
     If ($FalloutInstallPath.Length -eq 0) {
         # try default Bethesda installer paths
-        If (Test-Path ${env:ProgramFiles(x86)}) {
+        If (Test-Path -Path ${env:ProgramFiles(x86)}) {
             # x64 OS
             $FalloutInstallPath = "$(${env:ProgramFiles(x86)})\Bethesda.net Launcher\games\$($FalloutGame)\Data"
         } else {
@@ -584,7 +604,7 @@ Function Main {
         }
 
         # try Steam installer paths
-        If (Test-Path ${env:ProgramFiles(x86)}) {
+        If (Test-Path -Path ${env:ProgramFiles(x86)}) {
             # x64 OS
             $FalloutInstallPath = "$(${env:ProgramFiles(x86)})\Steam\steamapps\common\$($FalloutGame)\Data"
         } else {
@@ -593,9 +613,18 @@ Function Main {
         }
     }
 
+    # Hunt down custom paths set by user
+    If ($FalloutInstallPath.Length -gt 0) {
+        # verify custom path with Data folder
+        If (Test-Path -Path "$($FalloutInstallPath)\Data") {
+            # add <game>\Data folder if needed our selves
+            $FalloutInstallPath += "\Data"
+        }
+    }
 
-    # Override path to my local path
+    # Override path to my local path (for debugging)
     #$FalloutInstallPath = "E:\Bethesda\$($FalloutGame)\Data"
+
 
     Write-Host ""
     Write-Host " --- EXTRACT FALLOUT SOUNDS FILES ---"
