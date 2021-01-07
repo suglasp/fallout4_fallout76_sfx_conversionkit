@@ -589,9 +589,7 @@ Function Main {
             }
         }
     }
-
-    $FalloutInstallPath
-
+    
     # Hunt down default paths
     If ($FalloutInstallPath.Length -eq 0) {
         # try default Bethesda installer paths
