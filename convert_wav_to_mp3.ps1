@@ -3,7 +3,7 @@
 # Pieter De Ridder
 # Script to convert wav (RIFF) to mp3 (Compressed) in a loop
 # created : 25/02/2020
-# updated : 06/01/2021
+# updated : 11/01/2021
 #
 # Usage:
 # .\convert_wav_to_mp3.ps1 [-CustomDir <custom_path_directory>]
@@ -136,7 +136,7 @@ Function Main {
         for($i = 0; $i -lt $Arguments.Length; $i++) {
             #Write-Host "DEBUG : Arg $($i.ToString()) is $($Arguments[$i])"
 
-            # default, a PWSH Switch statement on a String is always case insenstive
+            # default, a PWSH Switch statement on a String is always case insensitive
             Switch ($Arguments[$i]) {
                 "-CustomDir" {
                     # manually override extraction folder

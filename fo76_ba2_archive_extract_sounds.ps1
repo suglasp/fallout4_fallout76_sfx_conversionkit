@@ -3,14 +3,14 @@
 # Pieter De Ridder
 # Extract Fallout 76 (Or Fallout 4) Sound files from BA2 archive files
 # Created : 15/03/2020
-# Updated : 07/01/2021
+# Updated : 11/01/2021
 #
 # Note : Because I use Powershell and use objects, but not really use OO architecture,
 # i work in each Function with Open en Close file statements. Just to be safe.
 # You can call this way any Function and it will handle the archive files in a safe manner.
 #
 # Usage:
-# .\fo76_ba2_archive_extract_sounds.ps1 [-InstallPath <fallout4_fallout76_installpath>] [-Fallout "Fallout4"|"Fallout76"] [-ExtractDir <extract_dir>] [-Help]
+# .\fo76_ba2_archive_extract_sounds.ps1 [-InstallPath <fallout4_fallout76_installpath>] [-Fallout "Fallout4"|"Fallout76"|"Fallout76PTS"] [-ExtractDir <extract_dir>] [-Help]
 #
 
 
@@ -23,8 +23,8 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 
 #Region Global vars
-[int32]$global:BA2HeaderSize = 24
-[string]$global:WorkDir = "$($PSScriptRoot)"
+[Int32]$global:BA2HeaderSize = 24
+[String]$global:WorkDir = "$($PSScriptRoot)"
 #EndRegion
 
 
@@ -36,7 +36,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 Function Show-FOHelp {
     Write-Host ""
     Write-Host "Usage:"
-    Write-Host ".\$(Split-Path -Path $MyInvocation.ScriptName -Leaf) [-InstallPath <fallout4_fallout76_installpath>] [-Fallout $([char](34))Fallout4|Fallout76] [-ExtractDir <extract_dir>] [-Help]"
+    Write-Host ".\$(Split-Path -Path $MyInvocation.ScriptName -Leaf) [-InstallPath <fallout4_fallout76_installpath>] [-Fallout $([char](34))Fallout4|Fallout76|Fallout76PTS] [-ExtractDir <extract_dir>] [-Help]"
     Write-Host ""
     Exit(0)
 }
@@ -540,7 +540,7 @@ Function Main {
         [string[]]$Arguments
     )
      
-    [string]$FalloutGame        = "Fallout76"                       # change this to Fallout4 or Fallout76
+    [string]$FalloutGame        = "Fallout 76"                      # change this to Fallout 4, Fallout 76, Fallout 76 PTS
     [string]$FalloutInstallPath = ""                                # internal var for installation path
     [string]$MyExtractionFolder = "$($PSScriptRoot)\extracted_sfx"  # extraction folder
 
@@ -549,13 +549,18 @@ Function Main {
         for($i = 0; $i -lt $Arguments.Length; $i++) {
             #Write-Host "DEBUG : Arg $($i.ToString()) is $($Arguments[$i])"
 
-            # default, a PWSH Switch statement on a String is always case insenstive
+            # default, a PWSH Switch statement on a String is always case insensitive
             Switch ($Arguments[$i]) {
                 "-InstallPath" {                    
                     # manually override Fallout Installation Path
                     If (($i +1) -le $Arguments.Length) {
                         $FalloutInstallPath = $Arguments[$i +1]
-                    }   
+                    }
+
+                    # remove trailing backslash if needed
+                    If ($FalloutInstallPath.EndsWith('\')) {
+                        $FalloutInstallPath = $FalloutInstallPath.Substring(0, $FalloutInstallPath.Length -1)
+                    }
                 }
 
                 "-Fallout" {
@@ -564,10 +569,12 @@ Function Main {
                         $FalloutGame = $Arguments[$i +1]
                     }
 
-                    # remove trailing backslash if needed
-                    If ($FalloutInstallPath.EndsWith('\')) {
-                        $FalloutInstallPath = $FalloutInstallPath.Substring(0, $FalloutInstallPath.Length -1)
-                    }                 
+                    # Bethesda launcher per default installs the game in a folder with a space.
+                    Switch ($FalloutGame) {
+                        "Fallout4" { $FalloutGame = "Fallout 4" }
+                        "Fallout76" { $FalloutGame = "Fallout 76" }
+                        "Fallout76PTS" { $FalloutGame = "Fallout 76 PTS" } 
+                    }                    
                 }
 
                 "-ExtractDir" {
@@ -590,28 +597,33 @@ Function Main {
         }
     }
     
-    # Hunt down default paths
+    # Hunt down default paths (if empty, otherwise user provided a path and we skip this step)
     If ($FalloutInstallPath.Length -eq 0) {
-        # try default Bethesda installer paths
-        If (Test-Path -Path ${env:ProgramFiles(x86)}) {
+        # try Bethesda Launcher installer paths
+        If (Test-Path -Path "$($env:ProgramFiles)\Bethesda.net Launcher\games\$($FalloutGame)") {
             # x64 OS
-            $FalloutInstallPath = "$(${env:ProgramFiles(x86)})\Bethesda.net Launcher\games\$($FalloutGame)\Data"
+            $FalloutInstallPath = "$($env:ProgramFiles)\Bethesda.net Launcher\games\$($FalloutGame)\Data"
         } else {
             # x86 OS
-            $FalloutInstallPath = "$($env:ProgramFiles)\Bethesda.net Launcher\games\$($FalloutGame)\Data"
+            If (Test-Path -Path "$(${env:ProgramFiles(x86)})\Bethesda.net Launcher\games\$($FalloutGame)") {
+                $FalloutInstallPath = "$(${env:ProgramFiles(x86)})\Bethesda.net Launcher\games\$($FalloutGame)\Data"
+            }
         }
 
-        # try Steam installer paths
-        If (Test-Path -Path ${env:ProgramFiles(x86)}) {
+        # try Valve Steam installer paths
+        If (Test-Path -Path "$($env:ProgramFiles)\Steam\steamapps\common\$($FalloutGame)") {
             # x64 OS
-            $FalloutInstallPath = "$(${env:ProgramFiles(x86)})\Steam\steamapps\common\$($FalloutGame)\Data"
+            $FalloutInstallPath = "$($env:ProgramFiles)\Steam\steamapps\common\$($FalloutGame)\Data"
         } else {
             # x86 OS
-            $FalloutInstallPath = "$($env:ProgramFiles)\Steam\steamapps\common\$($FalloutGame)\Data"
+            If (Test-Path -Path "$(${env:ProgramFiles(x86)})\Steam\steamapps\common\$($FalloutGame)") {
+                $FalloutInstallPath = "$(${env:ProgramFiles(x86)})\Steam\steamapps\common\$($FalloutGame)\Data"
+            }
         }
     }
 
-    # Hunt down custom paths set by user
+
+    # Hunt down custom paths overrided by user
     If ($FalloutInstallPath.Length -gt 0) {
         # verify custom path with Data folder
         If (Test-Path -Path "$($FalloutInstallPath)\Data") {
@@ -620,8 +632,9 @@ Function Main {
         }
     }
 
+
     # Override path to my local path (for debugging)
-    #$FalloutInstallPath = "E:\Bethesda\$($FalloutGame)\Data"
+    #$FalloutInstallPath = "E:\Bethesda\$($FalloutGame.Substring(" ", ''))\Data"
 
 
     Write-Host ""
