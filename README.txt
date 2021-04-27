@@ -64,7 +64,7 @@ Step 1) -> this takes the longest. This will generate a lot of Gigabytes of data
 Download the Extraction tool here https://github.com/suglasp/fo4_fo76_sfx_conversionkit/fo76_ba2_archive_extract_sounds.ps1    ( or download the B.E.A. Tool https://www.nexusmods.com/fallout4/mods/78/? )
 
 Parameters (optional):
-fo76_ba2_archive_extract_sounds.ps1 [-InstallPath <fallout4_fallout76_installpath>] [-Fallout "Fallout4"|"Fallout76"] [-ExtractDir <extract_dir>]
+fo76_ba2_archive_extract_sounds.ps1 [-InstallPath <fallout4_fallout76_installpath>] [-Fallout "Fallout4"|"Fallout76"|"Fallout76PTS"] [-ExtractDir <extract_dir>]
 
 
 Open powershell and run .\fo76_ba2_archive_extract_sounds.ps1.
