@@ -39,6 +39,9 @@ Update 11/01/2021:
 - Improved Fallout default game installation path checking in the main script(s)
 - Fixed a few typo's in comments
 
+Update 04/10/2021:
+- Small optimization in code.
+
 -----
 
 >> In high level overview, these are the steps we do:

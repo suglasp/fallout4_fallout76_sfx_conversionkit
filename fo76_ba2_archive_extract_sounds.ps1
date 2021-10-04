@@ -3,7 +3,7 @@
 # Pieter De Ridder
 # Extract Fallout 76 (Or Fallout 4) Sound files from BA2 archive files
 # Created : 15/03/2020
-# Updated : 11/01/2021
+# Updated : 04/10/2021
 #
 # Note : Because I use Powershell and use objects, but not really use OO architecture,
 # i work in each Function with Open en Close file statements. Just to be safe.
@@ -52,10 +52,10 @@ Function Get-BA2FileList {
     )
 
     # create empty array
-    $BA2FilesList = @()
+    [System.Collections.ArrayList]$BA2FilesList = @()
 
     # hunt BA2 Archive files from given folder
-    If (Test-Path $GameInstallationPath) {
+    If (Test-Path -Path $GameInstallationPath) {
         $BA2FilesList = @((Get-ChildItem -Path $GameInstallationPath -File -Filter "*.ba2").FullName)
 
         # we got some files?
@@ -86,7 +86,7 @@ Function Dump-BA2HeaderRaw {
         [string]$BA2Filename
     )
 
-    If (Test-Path $BA2Filename) {
+    If (Test-Path -Path $BA2Filename) {
         # dump first 24 bytes (BA2 Header) as a string
         $bytes = [System.IO.File]::ReadAllBytes($BA2Filename)
         $BA2Dump = [System.Text.Encoding]::ASCII.GetString($bytes, 0, $global:BA2HeaderSize)
@@ -110,7 +110,7 @@ Function Read-BA2Header {
     # init empty var
     $BA2Header = $null
 
-    If (Test-Path $BA2Filename) {
+    If (Test-Path -Path $BA2Filename) {
         # Create a custom PWSH object for the BA2 Header
         $BA2Header = New-Object PSObject
 
@@ -175,7 +175,7 @@ Function Read-BA2NameTable {
     $BA2NameTable = [System.Collections.ArrayList]@()
 
     If ($BA2Header -ne $null) {
-        If (Test-Path $BA2Header.ArchiveFilePath) {
+        If (Test-Path -Path $BA2Header.ArchiveFilePath) {
             # open the BA2 Archive
             $BA2File = [System.IO.File]::OpenRead($BA2Header.ArchiveFilePath)
             $BA2Reader = New-Object System.IO.BinaryReader($BA2File, [System.Text.Encoding]::ASCII)
@@ -225,7 +225,7 @@ Function Read-BA2FileTable {
     $BA2FileTable = [System.Collections.ArrayList]@()
     
     If ($BA2Header -ne $null) {
-        If (Test-Path $BA2Header.ArchiveFilePath) {
+        If (Test-Path -Path $BA2Header.ArchiveFilePath) {
             # open the BA2 Archive
             $BA2File = [System.IO.File]::OpenRead($BA2Header.ArchiveFilePath)
             $BA2Reader = New-Object System.IO.BinaryReader($BA2File, [System.Text.Encoding]::ASCII)
@@ -389,7 +389,7 @@ Function DecompressWrite-BA2Lump {
 
 #
 # Function : Extract-BA2Data
-# Open archive and extract data lumps
+# Open archive and extract BA2 archive data lumps as files
 #
 Function Extract-BA2Data {
     Param(
@@ -401,7 +401,7 @@ Function Extract-BA2Data {
     If (Test-Path $ExtractDestinationPath) {
     
         If ($BA2Header -ne $null) {
-            If (Test-Path $BA2Header.ArchiveFilePath) {
+            If (Test-Path -Path $BA2Header.ArchiveFilePath) {
                 Write-Host ""
                 Write-Host "Archive File : $($BA2Header.ArchiveFilePath)"
 
@@ -427,10 +427,10 @@ Function Extract-BA2Data {
                             Write-Host "Archive Type : BA2 General archive"
                             Write-Host ""
                     
-                            If ($BA2FileTable.Length -gt 0) {                                                        
+                            If ($BA2FileTable.Length -gt 0) {                                                                         
                                 ForEach($BA2FileSig in $BA2FileTable) {                                    
-                                    $packedFilename = Split-Path -Path $BA2FileSig.FileName -Leaf
-                                    #$packedFolder   = Split-Path -Path $BA2FileSig.FileName -Parent
+                                    [string]$packedFilename = Split-Path -Path $BA2FileSig.FileName -Leaf
+                                    #[string]$packedFolder   = Split-Path -Path $BA2FileSig.FileName -Parent
 
                                     # extract only sound files
                                     If ($packedFilename.EndsWith(".xwm") -or $packedFilename.EndsWith(".fuz")) {
@@ -541,7 +541,7 @@ Function Main {
     )
      
     [string]$FalloutGame        = "Fallout 76"                      # change this to Fallout 4, Fallout 76, Fallout 76 PTS
-    [string]$FalloutInstallPath = ""                                # internal var for installation path
+    [string]$FalloutInstallPath = [string]::Empty                   # internal var for installation path
     [string]$MyExtractionFolder = "$($PSScriptRoot)\extracted_sfx"  # extraction folder
 
     # logic for cmdline arguments
@@ -550,8 +550,8 @@ Function Main {
             #Write-Host "DEBUG : Arg $($i.ToString()) is $($Arguments[$i])"
 
             # default, a PWSH Switch statement on a String is always case insensitive
-            Switch ($Arguments[$i]) {
-                "-InstallPath" {                    
+            Switch ($Arguments[$i]) {                    
+                "-InstallPath" {
                     # manually override Fallout Installation Path
                     If (($i +1) -le $Arguments.Length) {
                         $FalloutInstallPath = $Arguments[$i +1]
@@ -574,7 +574,7 @@ Function Main {
                         "Fallout4" { $FalloutGame = "Fallout 4" }
                         "Fallout76" { $FalloutGame = "Fallout 76" }
                         "Fallout76PTS" { $FalloutGame = "Fallout 76 PTS" } 
-                    }                    
+                    }
                 }
 
                 "-ExtractDir" {
@@ -628,14 +628,12 @@ Function Main {
         # verify custom path with Data folder
         If (Test-Path -Path "$($FalloutInstallPath)\Data") {
             # add <game>\Data folder if needed our selves
-            $FalloutInstallPath += "\Data"
+            $FalloutInstallPath = $FalloutInstallPath + "\Data"
         }
     }
 
-
-    # Override path to my local path (for debugging)
+    # Override path to my personal local path (for debugging)
     #$FalloutInstallPath = "E:\Bethesda\$($FalloutGame.Substring(" ", ''))\Data"
-
 
     Write-Host ""
     Write-Host " --- EXTRACT FALLOUT SOUNDS FILES ---"
