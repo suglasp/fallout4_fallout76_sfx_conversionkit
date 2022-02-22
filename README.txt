@@ -42,6 +42,9 @@ Update 11/01/2021:
 Update 04/10/2021:
 - Small optimization in code.
 
+Update 22/02/2022 (NOTICE):
+- Bethesda.net launcher will be retired between April-May 2022. After that time, i will update the scripts to point default to the Steam version.
+
 -----
 
 >> In high level overview, these are the steps we do:
