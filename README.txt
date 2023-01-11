@@ -5,15 +5,15 @@ Fallout 4 and Fallout 76 sound (sfx) and music Powershell conversion kit for PC.
 
 Update 19/03/2020:
 'fo76_ba2_archive_extract_sounds.ps1' is a backport of script 'fo76_ba2_archive_extracter_early_test.ps1'.
-The first one extracts only sound files (*.xwm and *.fuz files). The latter extracts all files from a General BA2 Archive type of files.
+The first one extracts only sound files (*.xwm and *.fuz files). The latter extracts all files from a 'General BA2' Archive type of files.
 
-There are 3 Fallout BA2 archives types:
+There are 3 Fallout BA2 known archive types:
 GNRL = General Archive  -> supported to unpack
 DX10 = Textures Archive -> unsupported to unpack
 GNMF = PS4 Archive      -> unsupported to unpack
 
 Update 22/04/2020:
-Since Wastelanders update for Fallout 76, bz2 archives with voice files (like for example "SeventySix - Voices".ba2) do not contain xWMA (*.xwm) formats anymore, but the Skyrim Fuze (*.fuz) format.
+Since Wastelanders update for Fallout 76, ba2 archives with voice files (like for example "SeventySix - Voices".ba2) do not contain xWMA (*.xwm) formats anymore, but the Skyrim Fuze (*.fuz) format.
 Fuze files (*.fuz) are actually a format with xWMA data and also include lipsync meta data (*.lip).
 In fact, a fuze file, is a file with two combined files stitched together.
 
@@ -21,7 +21,7 @@ Update 05/01/2020:
 - Made some small fixes to the script.
 - Main functions arguments where not passed.
 - Arguments datatype is now pre-defined as string array
-- extract path used a dot notation (Powershell), changed this so the script fill's in full path. Extract would fail to the Windows System folder when ran with a standard powershell startup shell.
+- Extract path used a dot notation (Powershell), changed this so the script fill's in full path. Extract would fail to the Windows System folder when ran with a standard powershell startup shell.
 - Now extracts the *.fuz files and *.xwm files
 - Added new script convert_fuz_to_xwm.ps1 to convert fuz to xwm files.
 - Convert scripts now start conversion tools with High priority, for faster processing.
@@ -33,7 +33,7 @@ Update 06/01/2020:
 
 Update 07/01/2020:
 - The sfx extract script, fo76_ba2_archive_extract_sounds.ps1, will now auto include <Fallout install path>\Data when a custom path is entered.
-- added -help parameter for cli help
+- Added -help parameter for cli help
 
 Update 11/01/2021:
 - Improved Fallout default game installation path checking in the main script(s)
@@ -44,6 +44,11 @@ Update 04/10/2021:
 
 Update 22/02/2022 (NOTICE):
 - Bethesda.net launcher will be retired between April-May 2022. After that time, i will update the scripts to point default to the Steam version.
+
+Update 11/03/2023:
+- Changed routine to hunt down install paths for FO4, FO76, FO76PST.
+  Bethesda.net launcher code is removed and also the "fixed" Steam installer locations.
+  The code now hunts down the paths from Valve Steam installer locations in Windows registry.
 
 -----
 

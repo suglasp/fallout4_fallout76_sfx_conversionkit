@@ -2,11 +2,12 @@
 #
 # Pieter De Ridder
 # Extract Fallout 76 (Or Fallout 4) Sound files from BA2 archive files
+# https://github.com/suglasp/fallout4_fallout76_sfx_conversionkit
 # Created : 15/03/2020
-# Updated : 04/10/2021
+# Updated : 11/01/2023
 #
-# Note : Because I use Powershell and use objects, but not really use OO architecture,
-# i work in each Function with Open en Close file statements. Just to be safe.
+# Note : Because I use Powershell and use objects, but not really use OO .NET Style architecture,
+# I work in each Function with Open en Close file statements. Just to be safe.
 # You can call this way any Function and it will handle the archive files in a safe manner.
 #
 # Usage:
@@ -23,8 +24,8 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 
 #Region Global vars
-[Int32]$global:BA2HeaderSize = 24
-[String]$global:WorkDir = "$($PSScriptRoot)"
+[Int32]$Global:BA2HeaderSize = 24
+[String]$Global:WorkDir      = "$($PSScriptRoot)"
 #EndRegion
 
 
@@ -89,9 +90,9 @@ Function Dump-BA2HeaderRaw {
     If (Test-Path -Path $BA2Filename) {
         # dump first 24 bytes (BA2 Header) as a string
         $bytes = [System.IO.File]::ReadAllBytes($BA2Filename)
-        $BA2Dump = [System.Text.Encoding]::ASCII.GetString($bytes, 0, $global:BA2HeaderSize)
+        $BA2Dump = [System.Text.Encoding]::ASCII.GetString($bytes, 0, $Global:BA2HeaderSize)
         Write-Host "---"
-        Write-Host "First $($global:BA2HeaderSize.ToString()) bytes : $($BA2Dump)"
+        Write-Host "First $($Global:BA2HeaderSize.ToString()) bytes : $($BA2Dump)"
         Write-Host "---"
     } else {
         Write-Warning "File $($BA2Filename) not found?!"
@@ -231,7 +232,7 @@ Function Read-BA2FileTable {
             $BA2Reader = New-Object System.IO.BinaryReader($BA2File, [System.Text.Encoding]::ASCII)
 
             # skip BA2 header
-            [void]$BA2Reader.BaseStream.Seek([long]$global:BA2HeaderSize, [System.IO.SeekOrigin]::Begin)
+            [void]$BA2Reader.BaseStream.Seek([long]$Global:BA2HeaderSize, [System.IO.SeekOrigin]::Begin)
 
             # archive type?
             Switch($BA2Header.ArchiveType) {
@@ -301,7 +302,6 @@ Function Read-BA2FileTable {
     # Return
     Return $BA2FileTable
 }
-
 
 
 #
@@ -411,7 +411,7 @@ Function Extract-BA2Data {
                     $BA2Reader = New-Object System.IO.BinaryReader($BA2File, [System.Text.Encoding]::ASCII)
 
                     # skip BA2 header
-                    #[void]$BA2Reader.BaseStream.Seek([long]$global:BA2HeaderSize, [System.IO.SeekOrigin]::Begin)
+                    #[void]$BA2Reader.BaseStream.Seek([long]$Global:BA2HeaderSize, [System.IO.SeekOrigin]::Begin)
 
                     [string]$BA2ExtractPath = "$($ExtractDestinationPath)\$(Split-Path -Path $BA2Header.ArchiveFilePath -Leaf)"
 
@@ -540,9 +540,9 @@ Function Main {
         [string[]]$Arguments
     )
      
-    [string]$FalloutGame        = "Fallout 76"                      # change this to Fallout 4, Fallout 76, Fallout 76 PTS
-    [string]$FalloutInstallPath = [string]::Empty                   # internal var for installation path
-    [string]$MyExtractionFolder = "$($PSScriptRoot)\extracted_sfx"  # extraction folder
+    [string]$FalloutGame        = "Fallout 76"                      # Change this to Fallout 4, Fallout 76, Fallout 76 Public Test Server
+    [string]$FalloutInstallPath = [string]::Empty                   # FO Installation path. Dynamically looked up or overrided by user.
+    [string]$MyExtractionFolder = "$($PSScriptRoot)\extracted_sfx"  # The data Extraction folder location.
 
     # logic for cmdline arguments
     If ($Arguments) {
@@ -569,11 +569,11 @@ Function Main {
                         $FalloutGame = $Arguments[$i +1]
                     }
 
-                    # Bethesda launcher per default installs the game in a folder with a space.
+                    # convert cmdline game codes to Steam parsable names (Windows registry)
                     Switch ($FalloutGame) {
                         "Fallout4" { $FalloutGame = "Fallout 4" }
                         "Fallout76" { $FalloutGame = "Fallout 76" }
-                        "Fallout76PTS" { $FalloutGame = "Fallout 76 PTS" } 
+                        "Fallout76PTS" { $FalloutGame = "Fallout 76 Public Test Server" } 
                     }
                 }
 
@@ -599,31 +599,82 @@ Function Main {
     
     # Hunt down default paths (if empty, otherwise user provided a path and we skip this step)
     If ($FalloutInstallPath.Length -eq 0) {
-        # try Bethesda Launcher installer paths
-        If (Test-Path -Path "$($env:ProgramFiles)\Bethesda.net Launcher\games\$($FalloutGame)") {
-            # x64 OS
-            $FalloutInstallPath = "$($env:ProgramFiles)\Bethesda.net Launcher\games\$($FalloutGame)\Data"
-        } else {
-            # x86 OS
-            If (Test-Path -Path "$(${env:ProgramFiles(x86)})\Bethesda.net Launcher\games\$($FalloutGame)") {
-                $FalloutInstallPath = "$(${env:ProgramFiles(x86)})\Bethesda.net Launcher\games\$($FalloutGame)\Data"
-            }
-        }
-
-        # try Valve Steam installer paths
-        If (Test-Path -Path "$($env:ProgramFiles)\Steam\steamapps\common\$($FalloutGame)") {
-            # x64 OS
-            $FalloutInstallPath = "$($env:ProgramFiles)\Steam\steamapps\common\$($FalloutGame)\Data"
-        } else {
-            # x86 OS
-            If (Test-Path -Path "$(${env:ProgramFiles(x86)})\Steam\steamapps\common\$($FalloutGame)") {
-                $FalloutInstallPath = "$(${env:ProgramFiles(x86)})\Steam\steamapps\common\$($FalloutGame)\Data"
-            }
-        }
+        # try Valve Steam app registry settings
+		#
+		# notice:
+		#   app id for Fallout 4      =  377160
+		#   app id for Fallout 76     = 1151340
+		#   app id for Fallout 76 PTS = 1836200
+		#   reg key for Steam         = HKLM:\SOFTWARE\WOW6432Node\Valve\Steam\InstallPath
+		#   reg key for App ID's      = HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App <id>\InstallLocation
+		[bool]$bSteamInstalled = $false
+		
+		# Query for x86 Windows Steam
+		If (Test-Path -Path "HKLM:\SOFTWARE\Valve\Steam") {
+			Try {
+				[string]$SteamInstallPath = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Valve\Steam").InstallPath
+				
+				If (-Not ([String]::IsNullOrEmpty($SteamInstallPath))) {
+					$bSteamInstalled = $true
+				}
+			} Catch {
+				# no Steam present?
+			}
+		}
+		
+		# Retry for x64 Windows Steam
+		If (-Not ($bSteamInstalled)) {
+			If (Test-Path -Path "HKLM:\SOFTWARE\WOW6432Node\Valve\Steam") {
+				Try {
+					[string]$SteamInstallPath = (Get-ItemProperty -Path "HKLM:\SOFTWARE\WOW6432Node\Valve\Steam").InstallPath
+					
+					If (-Not ([String]::IsNullOrEmpty($SteamInstallPath))) {
+						$bSteamInstalled = $true
+					}
+				} Catch {
+					# no Steam present?
+				}
+			}
+		}
+		
+		# Okay Steam is present on the system. Now Query game folder where it should be installed under the Steam platform
+		If ($bSteamInstalled) {
+			# fetch list of regex "Steam App*"
+			[System.Collections.ArrayList]$paths = @(Get-ChildItem -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App*")
+			
+			# enum paths and filter Fallout version we need
+			$paths | % {
+				If ( (Get-ItemProperty -Path "$($_.Name)".Replace("HKEY_LOCAL_MACHINE", "HKLM:") -Name "DisplayName").DisplayName.Equals($FalloutGame) ) {
+					$FalloutInstallPath = (Get-ItemProperty -Path "$($_.Name)".Replace("HKEY_LOCAL_MACHINE", "HKLM:") -Name "InstallLocation").InstallLocation
+				}
+			}
+		}
+		
+		# try Bethesda Launcher installer paths - depricated
+        #If (Test-Path -Path "$($env:ProgramFiles)\Bethesda.net Launcher\games\$($FalloutGame)") {
+        #    # x64 OS
+        #    $FalloutInstallPath = "$($env:ProgramFiles)\Bethesda.net Launcher\games\$($FalloutGame)\Data"
+        #} Else {
+        #    # x86 OS
+        #    If (Test-Path -Path "$(${env:ProgramFiles(x86)})\Bethesda.net Launcher\games\$($FalloutGame)") {
+        #        $FalloutInstallPath = "$(${env:ProgramFiles(x86)})\Bethesda.net Launcher\games\$($FalloutGame)\Data"
+        #    }
+        #}
+		
+		# try fixed Valve Steam installer paths - depricated
+        #If (Test-Path -Path "$($env:ProgramFiles)\Steam\steamapps\common\$($FalloutGame)") {
+        #    # x64 OS
+        #    $FalloutInstallPath = "$($env:ProgramFiles)\Steam\steamapps\common\$($FalloutGame)\Data"
+        #} Else {
+        #    # x86 OS
+        #    If (Test-Path -Path "$(${env:ProgramFiles(x86)})\Steam\steamapps\common\$($FalloutGame)") {
+        #        $FalloutInstallPath = "$(${env:ProgramFiles(x86)})\Steam\steamapps\common\$($FalloutGame)\Data"
+        #    }
+        #}
     }
 
 
-    # Hunt down custom paths overrided by user
+    # Hunt down custom paths (overrided by user)
     If ($FalloutInstallPath.Length -gt 0) {
         # verify custom path with Data folder
         If (Test-Path -Path "$($FalloutInstallPath)\Data") {
@@ -631,9 +682,7 @@ Function Main {
             $FalloutInstallPath = $FalloutInstallPath + "\Data"
         }
     }
-
-    # Override path to my personal local path (for debugging)
-    #$FalloutInstallPath = "E:\Bethesda\$($FalloutGame.Substring(" ", ''))\Data"
+	
 
     Write-Host ""
     Write-Host " --- EXTRACT FALLOUT SOUNDS FILES ---"
