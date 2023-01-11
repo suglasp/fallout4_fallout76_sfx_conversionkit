@@ -1,2 +1,7 @@
+Version can be found here.
 https://www.nexusmods.com/skyrim/mods/32075/?tab=files
 
+You can also get xWMAEncode.exe from the Legacy DirectX SDK from June 2010.
+One can install the SDK or just open the original install file with 7-Zip.
+It's located under .\DXSDK\Utilities\bin\x86\xWMAEncode.exe
+https://www.microsoft.com/en-ca/download/details.aspx?id=6812
