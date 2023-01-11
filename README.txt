@@ -62,8 +62,8 @@ Update 11/03/2023:
 ----
 
 >> Future project steps:
-- Include Powershell code for in bulk, read a extract *.fuz (container format that holds .lip & .xwm) and extract the xmw file data.
-- Include Powershell code for in bulk, read a decode *.xwm (same as Microsoft XAudio2 xWMA format) and convert it to wav file.
+- Include Powershell code for in bulk, read and extract *.fuz files. Container format that holds .lip + .xwm and extract the xmw file data.
+- Include Powershell code for in bulk, read and decode *.xwm files. Same format as Microsoft XAudio2 xWMA format, and convert it to wav files.
 - Make it so, if we detect Powershell version 7+, we process in parallel.
 
 -----
