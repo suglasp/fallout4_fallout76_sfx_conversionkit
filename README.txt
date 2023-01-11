@@ -46,7 +46,7 @@ Update 22/02/2022 (NOTICE):
 - Bethesda.net launcher will be retired between April-May 2022. After that time, i will update the scripts to point default to the Steam version.
 
 Update 11/03/2023:
-- Changed routine to hunt down install paths for FO4, FO76, FO76PST.
+- Changed routine to hunt down install paths for FO4, FO76, FO76PTS.
   Bethesda.net launcher code is removed and also the "fixed" Steam installer locations.
   The code now hunts down the paths from Valve Steam installer locations in Windows registry.
 
@@ -72,7 +72,7 @@ Update 11/03/2023:
 
 Steps:
 Step 1) -> this takes the longest. This will generate a lot of Gigabytes of data!
-Download the Extraction tool here https://github.com/suglasp/fo4_fo76_sfx_conversionkit/fo76_ba2_archive_extract_sounds.ps1    ( or download the B.E.A. Tool https://www.nexusmods.com/fallout4/mods/78/? )
+Download the Extraction tool here https://github.com/suglasp/fallout4_fallout76_sfx_conversionkit/fo76_ba2_archive_extract_sounds.ps1    ( or download the B.E.A. Tool https://www.nexusmods.com/fallout4/mods/78/? )
 
 Parameters (optional):
 fo76_ba2_archive_extract_sounds.ps1 [-InstallPath <fallout4_fallout76_installpath>] [-Fallout "Fallout4"|"Fallout76"|"Fallout76PTS"] [-ExtractDir <extract_dir>]
