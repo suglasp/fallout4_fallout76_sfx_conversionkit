@@ -62,8 +62,8 @@ Update 11/03/2023:
 ----
 
 >> Future project steps:
-- Include powershell code for in bulk, read a *.xwm (xWMA format) and write it to wav file.
-- Include powershell code for in bulk, read a *.fuz (special xWMA format) and write it to wav file.
+- Include Powershell code for in bulk, read a extract *.fuz (container format that holds .lip & .xwm) and extract the xmw file data.
+- Include Powershell code for in bulk, read a decode *.xwm (same as Microsoft XAudio2 xWMA format) and convert it to wav file.
 - Make it so, if we detect Powershell version 7+, we process in parallel.
 
 -----
@@ -114,7 +114,7 @@ Make a subfolder "xWMAEncode"
 Make a subfolder "fuze"
 
 Download BmlFuzDecode.exe to the folder "fuze" from https://www.nexusmods.com/skyrim/mods/73100/ (download BmlFuzTools and extract the zip file. Copy *.exe files to "fuze" folder).
-Download xWMAEncode.exe to the folder "xWMAEncode" from https://www.nexusmods.com/skyrim/mods/32075/?tab=files and extract to folder "xWMAEncode".
+Download xWMAEncode.exe to the folder "xWMAEncode" from https://www.nexusmods.com/skyrim/mods/32075/?tab=files or https://www.microsoft.com/en-ca/download/details.aspx?id=6812 and extract to folder "xWMAEncode".
 Download ffmpeg static compiled for Windows to "ffmpeg" from https://ffmpeg.org/download.html#build-windows and extract to folder "ffmpeg". (*)
 
 (*) Inside the "ffmpeg" folder, there needs to be a "bin" folder (so, ..\ffmpeg\bin) where you put the ffmpeg.exe file.
