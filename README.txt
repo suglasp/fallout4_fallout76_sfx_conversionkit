@@ -45,10 +45,14 @@ Update 04/10/2021:
 Update 22/02/2022 (NOTICE):
 - Bethesda.net launcher will be retired between April-May 2022. After that time, i will update the scripts to point default to the Steam version.
 
-Update 11/03/2023:
+Update 11/01/2023:
 - Changed routine to hunt down install paths for FO4, FO76, FO76PTS.
   Bethesda.net launcher code is removed and also the "fixed" Steam installer locations.
   The code now hunts down the paths from Valve Steam installer locations in Windows registry.
+
+Update 14/01/2023:
+- script 'convert_fuz_to_xwm.ps1' is rewritten so does not need any 3rd party tools for extracting xwm data from all Fuze files.
+  The "fuze" subfolder and utility BmlFuzDecode are made obsolete.
 
 -----
 
@@ -62,9 +66,9 @@ Update 11/03/2023:
 ----
 
 >> Future project steps:
-- Include Powershell code for in bulk, read and extract *.fuz files. Container format that holds .lip + .xwm and extract the xmw file data.
-- Include Powershell code for in bulk, read and decode *.xwm files. Same format as Microsoft XAudio2 xWMA format, and convert it to wav files.
-- Make it so, if we detect Powershell version 7+, we process in parallel.
+- (done) Include Powershell code for in bulk, read and extract *.fuz files. Container format that holds .lip + .xwm and extract the xmw file data.
+- (todo) Include Powershell code for in bulk, read and decode *.xwm files. Same format as Microsoft XAudio2 xWMA format, and convert it to wav files.
+- (todo) Make it so, if we detect Powershell version 7+, we process in parallel.
 
 -----
 
@@ -111,9 +115,7 @@ Step 2)  -> prepare for conversion of xwm files to wav/mp3
 Copy convert_wav_to_mp3.ps1, convert_fuz_to_xwm.ps1 and convert_xwm_to_wav.ps1 to the extract folder.
 Make a subfolder "ffmpeg"
 Make a subfolder "xWMAEncode"
-Make a subfolder "fuze"
 
-Download BmlFuzDecode.exe to the folder "fuze" from https://www.nexusmods.com/skyrim/mods/73100/ (download BmlFuzTools and extract the zip file. Copy *.exe files to "fuze" folder).
 Download xWMAEncode.exe to the folder "xWMAEncode" from https://www.nexusmods.com/skyrim/mods/32075/?tab=files or https://www.microsoft.com/en-ca/download/details.aspx?id=6812 and extract to folder "xWMAEncode".
 Download ffmpeg static compiled for Windows to "ffmpeg" from https://ffmpeg.org/download.html#build-windows and extract to folder "ffmpeg". (*)
 
