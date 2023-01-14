@@ -25,7 +25,7 @@ $global:WorkingDir = "$($PSScriptRoot)"
 
 #
 # Function : Convert-ToFuz
-# Convert fuz file to xwm with BmlFuzDecode
+# Extract xwm data from a single fuz file
 #
 Function Convert-ToFuz {
 
@@ -69,7 +69,7 @@ Function Convert-ToFuz {
 
             If ($FUZEHeader.FuzMagic -eq "FUZE") {
                 # add a boolean to mark this is a correct FUZE file type
-                Add-Member -InputObject $FUZEHeader -MemberType NoteProperty -Name IsFuze -Value $([bool]$true)
+                Add-Member -InputObject $FUZEHeader -MemberType NoteProperty -Name IsFuze -Value $([Bool]$true)
 
                 # skip 4 offset bytes we don't need in the Fuz header
                 [void]$FuzReader.BaseStream.Seek(4, [System.IO.SeekOrigin]::Current)
@@ -78,10 +78,10 @@ Function Convert-ToFuz {
                 Add-Member -InputObject $FUZEHeader -MemberType NoteProperty -Name FuzLipSize -Value $([System.BitConverter]::ToUInt32($FuzReader.ReadBytes(4), 0))
             } Else {
                 # add a boolean to mark this is NOT a correct FUZE file type
-                Add-Member -InputObject $FUZEHeader -MemberType NoteProperty -Name IsFuze -Value $([bool]$false)
+                Add-Member -InputObject $FUZEHeader -MemberType NoteProperty -Name IsFuze -Value $([Bool]$false)
             }
 
-            Write-Host "DEBUG : IsFuze $($FUZEHeader.IsFuze)"
+            #Write-Host "DEBUG : IsFuze $($FUZEHeader.IsFuze)"
 
             If ($FUZEHeader.IsFuze) {
                 Write-Host "Generating $($sOutputFile)..."
@@ -93,11 +93,11 @@ Function Convert-ToFuz {
                 }
             
                 # extract and write the xwm data stream to a file on disk
-                [uint32]$XwmDataLen = ($FuzReader.BaseStream.Length - $FUZEHeader.FuzLipSize - $FUZEHeader.FuzHeaderSize)
-                Write-Host "DEBUG : Stream length $($FuzReader.BaseStream.Length)"
-                Write-Host "DEBUG : Header size $($FUZEHeader.FuzHeaderSize)"
-                Write-Host "DEBUG : Lip size $($FUZEHeader.FuzLipSize)"
-                Write-Host "DEBUG : XwmDataLen $($XwmDataLen)"
+                [UInt32]$XwmDataLen = ($FuzReader.BaseStream.Length - $FUZEHeader.FuzLipSize - $FUZEHeader.FuzHeaderSize)
+                #Write-Host "DEBUG : Stream length $($FuzReader.BaseStream.Length)"
+                #Write-Host "DEBUG : Header size $($FUZEHeader.FuzHeaderSize)"
+                #Write-Host "DEBUG : Lip size $($FUZEHeader.FuzLipSize)"
+                #Write-Host "DEBUG : XwmDataLen $($XwmDataLen)"
 
                 [System.Byte[]]$XwmData = [System.Byte[]]::New($XwmDataLen)
                 $XwmData = $FuzReader.ReadBytes($XwmDataLen)
@@ -136,7 +136,7 @@ Function Convert-ToFuz {
 
 #
 # Function : Convert-FuzBulk 
-# Convert fuz files in bulk to xwm
+# Extraction xwm data from fuz data files in bulk
 #
 Function Convert-FuzBulk  {
     Param (
@@ -150,12 +150,12 @@ Function Convert-FuzBulk  {
         [System.Collections.ArrayList]$arrFuzFiles = @((Get-ChildItem -Path "$($Root)" -File -Filter "*.fuz" -Recurse).FullName)
         
         If ($arrFuzFiles.Length -gt 0) {
-            Write-Host "Starting conversion of files..."
+            Write-Host "Starting extraction of files..."
             ForEach($FuzFile in $arrFuzFiles) {
                 Convert-ToFuz -FuzFile $FuzFile
             }
         } Else {
-            Write-Warning "No files found to convert?"
+            Write-Warning "No fuz files found to extract?"
         }
     } Else {
         Write-Warning "$($Root) path not found?"
@@ -165,11 +165,10 @@ Function Convert-FuzBulk  {
 
 #
 # Function : Main
-# Main function
 #
-# convert all fuz (Skyrim or Fallout Fuze files) files in folder 'in-place' to xwm files.
-# .fuz files get converted, serial wise a.k.a. synchronious, to .xwm.
-# the output xwm file is placed next to the existing fuz file.
+# Convert all fuz (Skyrim or Fallout Fuze files) files in folder 'in-place' to xwm files.
+# .fuz files contain lip and xwm data. The xwm data is extracted .xwm files.
+# The output xwm files are placed next to the existing fuz files.
 #
 Function Main {
 
