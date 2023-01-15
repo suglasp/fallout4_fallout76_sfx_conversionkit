@@ -4,7 +4,7 @@
 # Script to convert fuz (Skyrim or Fallout Fuze data type) to xwm (xWMA sound files) in bulk
 # https://github.com/suglasp/pwsh_convert_fuz_to_xwm
 # created : 05/01/2021
-# updated : 14/01/2021
+# updated : 15/01/2021
 #
 # Usage:
 # .\convert_fuz_to_xwm.ps1 [-CustomDir <custom_path_directory>]
@@ -84,7 +84,7 @@ Function Convert-ToFuz {
             #Write-Host "DEBUG : IsFuze $($FUZEHeader.IsFuze)"
 
             If ($FUZEHeader.IsFuze) {
-                Write-Host "Generating $($sOutputFile)..."
+                Write-Host "Generating $($sOutputXwmFile)..."
 
                 # if the Lip data size is larger then 0, the fuz file contains lip data.
                 # we skip this data if needed.
