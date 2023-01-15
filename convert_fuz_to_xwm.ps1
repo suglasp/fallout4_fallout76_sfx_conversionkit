@@ -46,9 +46,9 @@ Function Convert-ToFuz {
 
         # Extract the xwm data from the fuz data file
         If (-not (Test-Path -Path $sOutputXwm)) {
-            # fuz file header
-            # 4 bytes = FUZE 
-            # 4 bytes = unknown/unused
+            # fuz(e) file header format
+            # 4 bytes = FUZE magic header
+            # 4 bytes = unknown/unused, I suspect some kind of version number.
             # 4 bytes = Lip data size. Can be 0 or larger.
             # lip data (if Lip data size is larger then 0)^
             # xwm data
