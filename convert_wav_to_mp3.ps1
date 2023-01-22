@@ -18,7 +18,8 @@ $Global:ffmpeg = "$($Global:WorkingDirFFMPEG)\ffmpeg.exe"
 
 #
 # Function : Convert-ToWav2MP3
-# Convert wav file to mp3 with ffmpeg.exe 
+# Convert wav file to mp3 with ffmpeg.exe.
+# Supports ffmpeg.exe version 3.x.
 #
 Function Convert-ToWav2MP3 {
 
@@ -37,18 +38,19 @@ Function Convert-ToWav2MP3 {
                 [String]$sOutputMp3 = "$($sOutputPath)\$($sOutputMp3File)"
 
                 If (-not (Test-Path -Path $sOutputMp3)) {
-                    $sProcArgs = "-i $([char]34)$($WAVFile)$([char]34) -vn -ar 44100 -ac 2 -b:4 192k $([char]34)$($sOutputMp3)$([char]34)" 
+                    $sProcArgs = "-i $([char]34)$($WAVFile)$([char]34) -vn -ar 44100 -ac 2 -b:4 192k $([char]34)$($sOutputMp3)$([char]34) -hwaccels"
                     #$arrProcArgs = @()
-                    #$arrProcArgs += "-i" 
+                    #$arrProcArgs += "-i"   # input filename
                     #$arrProcArgs += "$([char]34)$($WAVFile)$([char]34)"
-                    #$arrProcArgs += "-vn" 
-                    #$arrProcArgs += "-ar" 
+                    #$arrProcArgs += "-vn"  # -v log level and -n never overwrite output files
+                    #$arrProcArgs += "-ar"   # sound rate of 44100Hz
                     #$arrProcArgs += "44100" 
-                    #$arrProcArgs += "-ac"
+                    #$arrProcArgs += "-ac"   # 2 channels
                     #$arrProcArgs += "2"
-                    #$arrProcArgs += "-b:a"
-                    #$arrProcArgs += "192k"
-                    #$arrProcArgs += "$([char]34)$($sOutputMp3)$([char]34)"
+                    #$arrProcArgs += "-b:a"  # bitrate of 192K
+                    #$arrProcArgs += "192k"  
+                    #$arrProcArgs += "$([char]34)$($sOutputMp3)$([char]34)"  # output filename
+                    #$arrProcArgs += "-hwaccels"  # optional, enable HW acceleration if available
 
                     Write-Host "Generating $($sOutputMp3File)..."
                     #$p = Start-Process -FilePath $Global:ffmpeg -WorkingDirectory $Global:WorkingDirFFMPEG -ArgumentList $arrProcArgs -NoNewWindow -Wait -PassThru
