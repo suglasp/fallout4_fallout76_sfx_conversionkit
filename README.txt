@@ -48,11 +48,15 @@ Update 22/02/2022 (NOTICE):
 Update 11/01/2023:
 - Changed routine to hunt down install paths for FO4, FO76, FO76PTS.
   Bethesda.net launcher code is removed and also the "fixed" Steam installer locations.
-  The code now hunts down the paths from Valve Steam installer locations in Windows registry.
+  The code now hunts down the paths from Valve Steam installer locations in Windows registry. (*)
+  (*) I've noticed, if you install a game in Steam, and later move it to an other Game Library in your Steam account,
+      Steam does not update the installation path of the moved game in Windows Registry. This is a bug in Steam.
+      In this case, fo76_ba2_archive_extract_sounds.ps1 will give you a warning the game path is not found.
+      To fix this, you need to use .\fo76_ba2_archive_extract_sounds.ps1 -InstallPath "<driveletter>:\SteamLibrary\steamapps\common\<game_name>\".
 
 Update 14/01/2023:
-- script 'convert_fuz_to_xwm.ps1' is rewritten so does not need any 3rd party tools for extracting xwm data from all Fuze files.
-  The "fuze" subfolder and utility BmlFuzDecode are made obsolete.
+- Script 'convert_fuz_to_xwm.ps1' is rewritten, so it does not need any 3rd party tools for extracting xwm data from all Fuze files.
+  The "fuze" subfolder and utility BmlFuzDecode.exe are made obsolete in order for the script to work.
 
 -----
 
@@ -82,16 +86,16 @@ Parameters (optional):
 fo76_ba2_archive_extract_sounds.ps1 [-InstallPath <fallout4_fallout76_installpath>] [-Fallout "Fallout4"|"Fallout76"|"Fallout76PTS"] [-ExtractDir <extract_dir>]
 
 
-Open powershell and run .\fo76_ba2_archive_extract_sounds.ps1.
+Open powershell and run .\fo76_ba2_archive_extract_sounds.ps1 -Fallout <FO_game_you_want> -ExtractDir <folder_to_extract>.
 
-Default, the script will search in the Steam or Bethesda Launcher installation folders.
-If you installed FO4 of FO76 in a custom path, use the flag .\fo76_ba2_archive_extract_sounds.ps1 -InstallPath <path>
+Default, the script will search in the Steam installation folders it finds in Windows Registry.
+If you installed FO4 of FO76 in a custom path, use the flag .\fo76_ba2_archive_extract_sounds.ps1 -InstallPath <path>.
 The script above will search all *.ba2 files, and will start extracting all *.xwm files or *.fuz files automatically.
 
-Default, the script will target 'Fallout76'. If you want Fallout 4,
-then use the flag .\fo76_ba2_archive_extract_sounds.ps1 -Fallout "Fallout4".
+Default, the script will target 'Fallout76'. If you want Fallout 4 or Fallout 76 PTS,
+then use the flag .\fo76_ba2_archive_extract_sounds.ps1 -Fallout "Fallout4" or .\fo76_ba2_archive_extract_sounds.ps1 -Fallout "Fallout76PTS"
 
-Default, the script will create a subfolder "extracted_sfx" in the folder where it is ran.
+Default, the script will create a subfolder "extracted_sfx" in the folder from where it is ran.
 If you want to change the extraction path, use the flag .\fo76_ba2_archive_extract_sounds.ps1 -ExtractDir "<full path to folder>"
 
 
