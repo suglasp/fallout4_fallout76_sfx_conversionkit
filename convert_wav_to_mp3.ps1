@@ -4,7 +4,7 @@
 # Script to convert wav (RIFF) to mp3 (Compressed) in a loop
 # https://github.com/suglasp/pwsh_convert_wav_to_mp3
 # created : 25/02/2020
-# updated : 15/01/2023
+# updated : 22/01/2023
 #
 # Usage:
 # .\convert_wav_to_mp3.ps1 [-CustomDir <custom_path_directory>]
@@ -75,7 +75,7 @@ Function Convert-ToWav2MP3 {
                         Write-Warning "mp3 conversion : failed? [Exitcode $($p.ExitCode)]"
                     }
                 } Else {
-                    Write-Warning "$([char]34)$($sOutput)$([char]34) already exists."
+                    Write-Warning "$([char]34)$($sOutputMp3)$([char]34) already exists."
                 }
             } Else {
                 Write-Warning "$([char]34)$($WAVFile)$([char]34) not a wav file?"
