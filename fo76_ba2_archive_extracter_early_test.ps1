@@ -4,11 +4,11 @@
 # Extract Fallout 76 (Or Fallout 4) BA2 archive files
 # https://github.com/suglasp/fallout4_fallout76_sfx_conversionkit
 # Created : 15/03/2020
-# Updated : 11/01/2023
+# Updated : 29/09/2023
 #
-# Note : Because I use Powershell and use objects, but not really use OO .NET Style architecture,
-# I work in each Function with Open en Close file statements. Just to be safe.
-# You can call this way any Function and it will handle the archive files in a safe manner.
+# Note : Because I use Powershell and use objects, but not really use OO .NET style architecture,
+# I work In each function with Open en Close file statements. Just to be safe.
+# You can call this way, any function and it will handle the archive files In a safe manner.
 #
 # Usage:
 # .\fo76_ba2_archive_extracter_early_test.ps1 [-InstallPath <fallout4_fallout76_installpath>] [-Fallout "Fallout4"|"Fallout76"|"Fallout76PTS"] [-ExtractDir <extract_dir>] [-Help]
@@ -25,7 +25,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 #Region Global vars
 [int32]$Global:BA2HeaderSize = 24
-[string]$Global:WorkDir      = "$($PSScriptRoot)"
+[String]$Global:WorkDir      = "$($PSScriptRoot)"
 #EndRegion
 
 
@@ -49,7 +49,7 @@ Function Show-FOHelp {
 #
 Function Get-BA2FileList {
     Param(
-        [string]$GameInstallationPath
+        [String]$GameInstallationPath
     )
 
     # create empty array
@@ -64,7 +64,7 @@ Function Get-BA2FileList {
             Write-Host "Found total number of $($BA2FilesList.Length.ToString()) BA2 Archives."
 
             # list files to stdout
-            ForEach($BA2File in $BA2FilesList) {
+            ForEach($BA2File In $BA2FilesList) {
                 Write-Host "$($BA2File)"
             }
         }
@@ -79,18 +79,18 @@ Function Get-BA2FileList {
 
 #
 # Function : Dump-BA2HeaderRaw
-# Do a raw file dump of the first 24 bytes of a BA2 file in string format?
+# Do a raw file dump of the first 24 bytes of a BA2 file In string format?
 # (First 24 bytes = BA2 Header)
 #
 Function Dump-BA2HeaderRaw {
     Param(
-        [string]$BA2Filename
+        [String]$BA2Filename
     )
 
     If (Test-Path -Path $BA2Filename) {
         # dump first 24 bytes (BA2 Header) as a string
-        $bytes = [System.IO.File]::ReadAllBytes($BA2Filename)
-        $BA2Dump = [System.Text.Encoding]::ASCII.GetString($bytes, 0, $Global:BA2HeaderSize)
+        [System.Array]$bytes = [System.IO.File]::ReadAllBytes($BA2Filename)
+        [String]$BA2Dump = [System.Text.Encoding]::ASCII.GetString($bytes, 0, $Global:BA2HeaderSize)
         Write-Host "---"
         Write-Host "First $($Global:BA2HeaderSize.ToString()) bytes : $($BA2Dump)"
         Write-Host "---"
@@ -105,7 +105,7 @@ Function Dump-BA2HeaderRaw {
 #
 Function Read-BA2Header {
     Param(
-        [string]$BA2Filename
+        [String]$BA2Filename
     )
 
     # init empty var
@@ -113,14 +113,14 @@ Function Read-BA2Header {
 
     If (Test-Path -Path $BA2Filename) {
         # Create a custom PWSH object for the BA2 Header
-        $BA2Header = New-Object PSObject
+        [PSObject]$BA2Header = New-Object PSObject
 
-        # we keep track in the header object the path of the file
+        # we keep track In the header object the path of the file
         Add-Member -InputObject $BA2Header -MemberType NoteProperty -Name ArchiveFilePath -Value $($BA2Filename)
     
         # open the BA2 Archive
-        $BA2File = [System.IO.File]::OpenRead($BA2Filename)
-        $BA2Reader = New-Object System.IO.BinaryReader($BA2File, [System.Text.Encoding]::ASCII)
+        [System.IO.Stream]$BA2File = [System.IO.File]::OpenRead($BA2Filename)
+        [System.IO.BinaryReader]$BA2Reader = New-Object System.IO.BinaryReader($BA2File, [System.Text.Encoding]::ASCII)
         #[void]$BA2Reader.BaseStream.Seek(0, [System.IO.SeekOrigin]::Begin)
 
         # get BA2 archive "Magic" text
@@ -133,10 +133,10 @@ Function Read-BA2Header {
             # get type of archive (GNRL or DX10)
             Add-Member -InputObject $BA2Header -MemberType NoteProperty -Name ArchiveType -Value $([System.Text.Encoding]::ASCII.GetString($BA2Reader.ReadBytes(4)))
 
-            # get nr of files in archive
+            # get nr of files In archive
             Add-Member -InputObject $BA2Header -MemberType NoteProperty -Name ArchiveFileCount -Value $([System.BitConverter]::ToUInt32($BA2Reader.ReadBytes(4), 0))
 
-            # get nr of files in archive
+            # get nr of files In archive
             Add-Member -InputObject $BA2Header -MemberType NoteProperty -Name ArchiveNameTableOffset -Value $([System.BitConverter]::ToUInt64($BA2Reader.ReadBytes(8), 0))
         } Else {
             # bail out!
@@ -173,20 +173,20 @@ Function Read-BA2NameTable {
     )
     
     # create empty array
-    $BA2NameTable = [System.Collections.ArrayList]@()
+    [System.Collections.ArrayList]$BA2NameTable = [System.Collections.ArrayList]@()
 
     If ($BA2Header -ne $null) {
         If (Test-Path -Path $BA2Header.ArchiveFilePath) {
             # open the BA2 Archive
-            $BA2File = [System.IO.File]::OpenRead($BA2Header.ArchiveFilePath)
-            $BA2Reader = New-Object System.IO.BinaryReader($BA2File, [System.Text.Encoding]::ASCII)
+            [System.IO.Stream]$BA2File = [System.IO.File]::OpenRead($BA2Header.ArchiveFilePath)
+            [System.IO.BinaryReader]$BA2Reader = New-Object System.IO.BinaryReader($BA2File, [System.Text.Encoding]::ASCII)
 
             # skip all data to offset of the Name Table (end of file)
             [void]$BA2Reader.BaseStream.Seek($BA2Header.ArchiveNameTableOffset, [System.IO.SeekOrigin]::Begin)
 
             while($BA2Reader.BaseStream.Position -lt $BA2Reader.BaseStream.Length) { 
-                [int16]$len = [System.BitConverter]::ToInt16($BA2Reader.ReadBytes(2), 0)
-                [string]$name = [System.Text.Encoding]::ASCII.GetString($BA2Reader.ReadBytes($len))
+                [Int16]$len = [System.BitConverter]::ToInt16($BA2Reader.ReadBytes(2), 0)
+                [String]$name = [System.Text.Encoding]::ASCII.GetString($BA2Reader.ReadBytes($len))
                 [void]$BA2NameTable.Add($name.Trim('\0'))
             }
 
@@ -223,13 +223,13 @@ Function Read-BA2FileTable {
     )
     
     # create empty array
-    $BA2FileTable = [System.Collections.ArrayList]@()
+    [System.Collections.ArrayList]$BA2FileTable = [System.Collections.ArrayList]@()
     
     If ($BA2Header -ne $null) {
         If (Test-Path -Path $BA2Header.ArchiveFilePath) {
             # open the BA2 Archive
-            $BA2File = [System.IO.File]::OpenRead($BA2Header.ArchiveFilePath)
-            $BA2Reader = New-Object System.IO.BinaryReader($BA2File, [System.Text.Encoding]::ASCII)
+            [System.IO.Stream]$BA2File = [System.IO.File]::OpenRead($BA2Header.ArchiveFilePath)
+            [System.IO.BinaryReader]$BA2Reader = New-Object System.IO.BinaryReader($BA2File, [System.Text.Encoding]::ASCII)
 
             # skip BA2 header
             [void]$BA2Reader.BaseStream.Seek([long]$Global:BA2HeaderSize, [System.IO.SeekOrigin]::Begin)
@@ -244,20 +244,20 @@ Function Read-BA2FileTable {
                     For($i = 0; $i -lt $BA2Header.ArchiveFileCount; $i++) {
 
                         # Create a custom PWSH object for the current BA2 File lump signature
-                        $BA2FileSig = New-Object PSObject
+                        [PSObject]$BA2FileSig = New-Object PSObject
                      
-                        # keep track of filename in archive we have -> using entry from NameTable
-                        $BA2InternalFileName = [string]::Empty
+                        # keep track of filename In archive we have -> using entry from NameTable
+                        [String]$BA2InternalFileName = [String]::Empty
                         
                         If ($BA2NameTable) {
                             # if Nametable is available, fill it the name
                             $BA2InternalFileName = $BA2NameTable[$i];
                         }
 
+                        # object filename
                         Add-Member -InputObject $BA2FileSig -MemberType NoteProperty -Name FileName -Value $($BA2InternalFileName)
 
-
-                        # read file lump signature details
+                        # read file lump signature details and add to object
                         Add-Member -InputObject $BA2FileSig -MemberType NoteProperty -Name FileHash -Value $([System.BitConverter]::ToUInt32($BA2Reader.ReadBytes(4), 0))
                         Add-Member -InputObject $BA2FileSig -MemberType NoteProperty -Name FileExt -Value $([System.Text.Encoding]::ASCII.GetString($BA2Reader.ReadBytes(4)))
                         Add-Member -InputObject $BA2FileSig -MemberType NoteProperty -Name FileDirHash -Value $([System.BitConverter]::ToUInt32($BA2Reader.ReadBytes(4), 0))
@@ -267,6 +267,7 @@ Function Read-BA2FileTable {
                         Add-Member -InputObject $BA2FileSig -MemberType NoteProperty -Name FileLenRaw -Value $([System.BitConverter]::ToUInt32($BA2Reader.ReadBytes(4), 0))
                         Add-Member -InputObject $BA2FileSig -MemberType NoteProperty -Name FileAlign -Value $([System.BitConverter]::ToUInt32($BA2Reader.ReadBytes(4), 0))   # 0xBAADF00?
 
+						# add object to list
                         [void]$BA2FileTable.Add($BA2FileSig)
                     }
 
@@ -310,13 +311,13 @@ Function Read-BA2FileTable {
 #
 Function RawWrite-BA2Lump {
     Param(
-        [string]$RAWFilename,
+        [String]$RAWFilename,
         [System.Byte[]]$BA2DataLump
     )
 
     # dump lump to a disk file (from memory)
     If ($BA2DataLump.Length -gt 0) {        
-        $FSLumpFileHnd = [System.IO.File]::OpenWrite($RAWFilename)
+        [System.IO.Stream]$FSLumpFileHnd = [System.IO.File]::OpenWrite($RAWFilename)
 
         If ($FSLumpFileHnd) {
             $FSLumpFileHnd.Write($BA2DataLump, 0, $BA2DataLump.Length)
@@ -336,9 +337,9 @@ Function RawWrite-BA2Lump {
 #
 Function DecompressWrite-BA2Lump {
     Param(
-        [string]$DecompressedFilename,
+        [String]$DecompressedFilename,
         [System.Byte[]]$BA2DataLump,
-        [uint32]$BA2UncompressedLength
+        [UInt32]$BA2UncompressedLength
     )
 
     # Init empty var
@@ -352,7 +353,7 @@ Function DecompressWrite-BA2Lump {
             [System.IO.MemoryStream]$compressedFileStream = New-Object System.IO.MemoryStream
             $compressedFileStream.Write($BA2DataLump, 0, $BA2DataLump.Length)
         
-            # skip ZLib header of 2 bytes in .NET
+            # skip ZLib header of 2 bytes In .NET
             [void]$compressedFileStream.Seek(2, [System.IO.SeekOrigin]::Begin)
 
             # decompress and store
@@ -367,7 +368,7 @@ Function DecompressWrite-BA2Lump {
             #$EncodedDecompressedData = [Convert]::ToBase64String($decompressedData)
 
             # write to file
-            $FSLumpFileHnd = [System.IO.File]::OpenWrite($DecompressedFilename)
+            [System.IO.Stream]$FSLumpFileHnd = [System.IO.File]::OpenWrite($DecompressedFilename)
 
             if ($FSLumpFileHnd) {
                 $FSLumpFileHnd.Write($decompressedData, 1, $decompressedData.Length -1)
@@ -394,10 +395,10 @@ Function Extract-BA2Data {
     Param(
         [PSObject]$BA2Header,
         [PSObject]$BA2FileTable,
-        [string]$ExtractDestinationPath
+        [String]$ExtractDestinationPath
     )
     
-    If (Test-Path $ExtractDestinationPath) {
+    If (Test-Path -Path $ExtractDestinationPath) {
     
         If ($BA2Header -ne $null) {
             If (Test-Path -Path $BA2Header.ArchiveFilePath) {
@@ -406,16 +407,16 @@ Function Extract-BA2Data {
 
                 If ($BA2FileTable -ne $null) {
                     # open the BA2 Archive
-                    $BA2File = [System.IO.File]::OpenRead($BA2Header.ArchiveFilePath)
-                    $BA2Reader = New-Object System.IO.BinaryReader($BA2File, [System.Text.Encoding]::ASCII)
+                    [System.IO.Stream]$BA2File = [System.IO.File]::OpenRead($BA2Header.ArchiveFilePath)
+                    [System.IO.BinaryReader]$BA2Reader = New-Object System.IO.BinaryReader($BA2File, [System.Text.Encoding]::ASCII)
 
                     # skip BA2 header
                     #[void]$BA2Reader.BaseStream.Seek([long]$Global:BA2HeaderSize, [System.IO.SeekOrigin]::Begin)
 
-                    [string]$BA2ExtractPath = "$($ExtractDestinationPath)\$(Split-Path -Path $BA2Header.ArchiveFilePath -Leaf)"
+                    [String]$BA2ExtractPath = "$($ExtractDestinationPath)\$(Split-Path -Path $BA2Header.ArchiveFilePath -Leaf)"
 
                     # create extraction folder if needed
-                    If (-Not(Test-Path $BA2ExtractPath)) {
+                    If (-Not (Test-Path -Path $BA2ExtractPath)) {
                         New-Item -Path $BA2ExtractPath -ItemType Directory -Force -ErrorAction SilentlyContinue
                     }
 
@@ -427,17 +428,17 @@ Function Extract-BA2Data {
                             Write-Host ""
                     
                             If ($BA2FileTable.Length -gt 0) {                                                                                  
-                                ForEach($BA2FileSig in $BA2FileTable) {
-                                    [string]$packedFilename = Split-Path -Path $BA2FileSig.FileName -Leaf
-                                    #[string]$packedFolder   = Split-Path -Path $BA2FileSig.FileName -Parent
+                                ForEach($BA2FileSig In $BA2FileTable) {
+                                    [String]$packedFilename = Split-Path -Path $BA2FileSig.FileName -Leaf
+                                    #[String]$packedFolder   = Split-Path -Path $BA2FileSig.FileName -Parent
 
                                     # create subfolders if needed
                                     [string[]]$packedSubFolders = (Split-Path -Path  $BA2FileSig.FileName -Parent).ToString().Split('\')
-                                    [string]$packedFolderBuildPath = "$($BA2ExtractPath)"
-                                    ForEach($packedFolderName in $packedSubFolders) {
+                                    [String]$packedFolderBuildPath = "$($BA2ExtractPath)"
+                                    ForEach($packedFolderName In $packedSubFolders) {
                                         $packedFolderBuildPath += "\$($packedFolderName)"
 
-                                        If (-Not(Test-Path $packedFolderBuildPath)) {
+                                        If (-Not (Test-Path -Path $packedFolderBuildPath)) {
                                             New-Item -Path $packedFolderBuildPath -ItemType Directory -Force -ErrorAction SilentlyContinue
                                         }
                                     }
@@ -446,11 +447,11 @@ Function Extract-BA2Data {
                                     # read data lump raw or compressed and write to a file on disk
                                     Write-Host "Extracting $($packedFilename) ..."
                                     
-                                    # got to offset in file for extraction of lump data
+                                    # got to offset In file for extraction of lump data
                                     [void]$BA2Reader.BaseStream.Seek([long]($BA2FileSig.FileOffset), [System.IO.SeekOrigin]::Begin)
 
                                     # default, we set raw length
-                                    [uint32]$LumpLen = $BA2FileSig.FileLenRaw
+                                    [UInt32]$LumpLen = $BA2FileSig.FileLenRaw
 
                                     # check if we need compressed
                                     If ($BA2FileSig.FileLenCompressed -gt 0) {
@@ -461,9 +462,9 @@ Function Extract-BA2Data {
                                     $LumpFileName = "$($packedFolderBuildPath)\$($packedFilename)"
 
                                     # skip lump extraction, if we already extracted the data before
-                                    If (-Not(Test-Path $LumpFileName)) {
+                                    If (-Not (Test-Path -Path $LumpFileName)) {
                                         # create byte array to host data
-                                        $LumpData = [System.Byte[]]::new($LumpLen)
+                                        $LumpData = [System.Byte[]]::New($LumpLen)
                                         $LumpData = $BA2Reader.ReadBytes($LumpLen)
                                         
                                         # decompress data lump if needed
@@ -540,9 +541,9 @@ Function Main {
         [string[]]$Arguments
     )
 
-    [string]$FalloutGame        = "Fallout 76"                      # Change this to Fallout 4, Fallout 76, Fallout 76 Public Test Server
-    [string]$FalloutInstallPath = [string]::Empty                   # FO Installation path. Dynamically looked up or overrided by user.
-    [string]$MyExtractionFolder = "$($PSScriptRoot)\extracted_sfx"  # The data Extraction folder location.
+    [String]$FalloutGame        = "Fallout 76"                      # Change this to Fallout 4, Fallout 76, Fallout 76 Public Test Server
+    [String]$FalloutInstallPath = [String]::Empty                   # FO Installation path. Dynamically looked up or overrided by user.
+    [String]$MyExtractionFolder = "$($PSScriptRoot)\extracted_sfx"  # The data Extraction folder location.
 
     # logic for cmdline arguments
     If ($Arguments) {
@@ -612,7 +613,7 @@ Function Main {
 		# Query for x86 Windows Steam
 		If (Test-Path -Path "HKLM:\SOFTWARE\Valve\Steam") {
 			Try {
-				[string]$SteamInstallPath = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Valve\Steam").InstallPath
+				[String]$SteamInstallPath = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Valve\Steam").InstallPath
 				
 				If (-Not ([String]::IsNullOrEmpty($SteamInstallPath))) {
 					$bSteamInstalled = $true
@@ -626,7 +627,7 @@ Function Main {
 		If (-Not ($bSteamInstalled)) {
 			If (Test-Path -Path "HKLM:\SOFTWARE\WOW6432Node\Valve\Steam") {
 				Try {
-					[string]$SteamInstallPath = (Get-ItemProperty -Path "HKLM:\SOFTWARE\WOW6432Node\Valve\Steam").InstallPath
+					[String]$SteamInstallPath = (Get-ItemProperty -Path "HKLM:\SOFTWARE\WOW6432Node\Valve\Steam").InstallPath
 					
 					If (-Not ([String]::IsNullOrEmpty($SteamInstallPath))) {
 						$bSteamInstalled = $true
@@ -678,7 +679,7 @@ Function Main {
     If ($FalloutInstallPath.Length -gt 0) {
         # verify custom path with Data folder
         If (Test-Path -Path "$($FalloutInstallPath)\Data") {
-            # add <game>\Data folder if needed our selves
+            # Append '<game>\Data' sub-folder if needed
             $FalloutInstallPath = $FalloutInstallPath + "\Data"
         }
     }
@@ -691,26 +692,33 @@ Function Main {
     Write-Host ""
 
     # Get List of BA2 files from the installation path
-    $BA2Files = Get-BA2FileList -GameInstallationPath $FalloutInstallPath
+    [System.Collections.ArrayList]$BA2Files = Get-BA2FileList -GameInstallationPath $FalloutInstallPath
 
-    # dump each BA2 file header
-    ForEach($BA2File in $BA2Files) {
-        # read BA2 Archive Header
-        $BA2FileHeader = Read-BA2Header -BA2Filename $BA2File
+    # Extract each BA2 file
+    ForEach($BA2File In $BA2Files) {
+        # Read BA2 Archive Header
+        [PSObject]$BA2FileHeader = Read-BA2Header -BA2Filename $BA2File
 
-        # read BA2 Archive Name Table (not all DX10 Archives seem to contain a NameTable)
-        $BA2NameTable = Read-BA2NameTable -BA2Header $BA2FileHeader
-
-        # read BA2 Archive File signatures
-        $BA2FileTable = Read-BA2FileTable -BA2Header $BA2FileHeader -BA2NameTable $BA2NameTable
-
-        # extract the BA2 File archives
-        If (-Not(Test-Path $MyExtractionFolder)) {
-            New-Item -Path $MyExtractionFolder -ItemType Directory
+        # Read BA2 Archive Name Table (Note : not all DX10 Archives seem to contain a NameTable)
+        [System.Collections.ArrayList]$BA2NameTable = @(Read-BA2NameTable -BA2Header $BA2FileHeader)
+		
+        # Read BA2 Archive File signatures
+        [System.Array]$BA2FileTable = @(Read-BA2FileTable -BA2Header $BA2FileHeader -BA2NameTable $BA2NameTable)
+		#[System.Collections.ArrayList]$BA2FileTable = Read-BA2FileTable -BA2Header $BA2FileHeader -BA2NameTable $BA2NameTable
+		
+        # Create extract BA2 File archive name folder
+        If (-Not (Test-Path -Path $MyExtractionFolder)) {
+            New-Item -Path $MyExtractionFolder -ItemType Directory -ErrorAction SilentlyContinue
         }
 
-        Extract-BA2Data -BA2Header $BA2FileHeader -BA2FileTable $BA2FileTable -ExtractDestinationPath $MyExtractionFolder
+		# Extract the BA2 File archive
+		If ($BA2FileTable -Is [System.Array]) {
+			Extract-BA2Data -BA2Header $BA2FileHeader -BA2FileTable $BA2FileTable -ExtractDestinationPath $MyExtractionFolder
+		}
     }
+	
+	# Gracefully exit
+	Exit(0)
 }
 
 
