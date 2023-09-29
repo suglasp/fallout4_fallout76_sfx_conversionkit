@@ -1,6 +1,23 @@
 Fallout 4 and Fallout 76 sound (sfx) and music Powershell conversion kit for PC.
 
 -----
+
+>> What is does:
+
+Toolkit that reads Fallout 4 or 76 game files, and extracts the audio/sound/music/sfx
+to a folder on your local computer/disk.
+
+-----
+
+>> Notice:
+
+This code or kit has nothing to do with Bethesda Softworks/Microsoft/Zenimax,
+and is only a small project I work on during my free hours.
+Secondly, this tool does not change or edit anything to the game files.
+It only reads the game data files and extracts data from within the compressed/archived files.
+
+-----
+
 >> conversion kit updates, fixes and patches:
 
 Update 19/03/2020:
@@ -58,20 +75,33 @@ Update 14/01/2023:
 - Script 'convert_fuz_to_xwm.ps1' is rewritten, so it does not need any 3rd party tools for extracting xwm data from all Fuze files.
   The "fuze" subfolder and utility BmlFuzDecode.exe are made obsolete in order for the script to work.
 
+Update 29/09/2023:
+- Since a recent update of the FO76 ba2 archives, most "SeventySix - Interface*.ba2" files, localization and Miscclient archives only
+  returned a single file. Powershell converts this to System.String instead of System.Array (or System.Collections.Array).
+  This spawned sometimes errors while extracting.
+- Refactored small pieces of code and made some DataType improvements.
+- Did some research on the xwm file format. Seems to be a very specific format of the WMA Pro/WMA2 file format. Created for Xbox.
+  Only the FFMpeg open source project supports this data type. The once leaked W2K3 code, contains parts of early code for the format.
+  Technically, we could try to write or convert it natively in Powershell/.NET. But in the end it will be more error prone
+  to write this code and cost me lots of time reversing it. The header of xwm files, are quite simple RIFF format headers.
+  So I decided to stick with FFMpeg to decode and convert the xwm files to wave.
+
 -----
 
 >> In high level overview, these are the steps we do:
 - Search inside the *.ba2 Fallout archive files for *.xwm (or now more recent also *.fuz) files.
 - Extract these files and write to disk.
 - Run a second tool to convert the *.fuz files to *.xwm.
-- Run a third tool to convert the *.xwm files to RIFF (wav files).
-- Run a fourth tool to convert the *.wav files to mp3. [optional]
+- Run a third tool to convert the *.xwm files to RIFF (wav files) - relies on FFMpeg.
+- Run a fourth tool to convert the *.wav files to mp3 [optional] - relies on FFMpeg.
 
 ----
 
 >> Future project steps:
-- (done) Include Powershell code for in bulk, read and extract *.fuz files. Container format that holds .lip + .xwm and extract the xmw file data.
-- (todo) Include Powershell code for in bulk, read and decode *.xwm files. Same format as Microsoft XAudio2 xWMA format, and convert it to wav files.
+- (done) Include Powershell code for in bulk, read and extract *.fuz files natively in Powershell.
+         Container format that holds .lip + .xwm and extract the xmw file data.
+- (skip) Include Powershell code for in bulk, read and decode *.xwm files natively in Powershell.
+         Same format as Microsoft XAudio2 xWMA format, and convert it to wav files.
 - (todo) Make it so, if we detect Powershell version 7+, we process in parallel.
 
 -----
