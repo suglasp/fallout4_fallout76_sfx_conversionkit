@@ -1,15 +1,15 @@
-Fallout 4 and Fallout 76 sound (sfx) and music Powershell conversion kit for PC.
+## Fallout 4 and Fallout 76 sound (sfx) and music Powershell conversion kit for PC.
 
 -----
 
->> What is does:
+**What is does**
 
 Toolkit that reads Fallout 4 or 76 game files, and extracts the audio/sound/music/sfx
 to a folder on your local computer/disk.
 
 -----
 
->> Notice:
+**Notice**
 
 This code or kit has nothing to do with Bethesda Softworks/Microsoft/Zenimax,
 and is only a small project I work on during my free hours.
@@ -18,19 +18,18 @@ It only reads the game data files and extracts data from within the compressed/a
 
 -----
 
->> conversion kit updates, fixes and patches:
+**Conversion kit updates, fixes and patches**
 
 Update 19/03/2020:
-'fo76_ba2_archive_extract_sounds.ps1' is a backport of script 'fo76_ba2_archive_extracter_early_test.ps1'.
+- 'fo76_ba2_archive_extract_sounds.ps1' is a backport of script 'fo76_ba2_archive_extracter_early_test.ps1'.
 The first one extracts only sound files (*.xwm and *.fuz files). The latter extracts all files from a 'General BA2' Archive type of files.
-
-There are 3 Fallout BA2 known archive types:
-GNRL = General Archive  -> supported to unpack
-DX10 = Textures Archive -> unsupported to unpack
-GNMF = PS4 Archive      -> unsupported to unpack
+- There are 3 Fallout BA2 known archive types:
+1. GNRL = General Archive  -> supported to unpack
+2. DX10 = Textures Archive -> unsupported to unpack
+3. GNMF = PS4 Archive      -> unsupported to unpack
 
 Update 22/04/2020:
-Since Wastelanders update for Fallout 76, ba2 archives with voice files (like for example "SeventySix - Voices".ba2) do not contain xWMA (*.xwm) formats anymore, but the Skyrim Fuze (*.fuz) format.
+- Since Wastelanders update for Fallout 76, ba2 archives with voice files (like for example "SeventySix - Voices".ba2) do not contain xWMA (*.xwm) formats anymore, but the Skyrim Fuze (*.fuz) format.
 Fuze files (*.fuz) are actually a format with xWMA data and also include lipsync meta data (*.lip).
 In fact, a fuze file, is a file with two combined files stitched together.
 
@@ -88,7 +87,8 @@ Update 29/09/2023:
 
 -----
 
->> In high level overview, these are the steps we do:
+**In high level overview, these are the steps we do**
+
 - Search inside the *.ba2 Fallout archive files for *.xwm (or now more recent also *.fuz) files.
 - Extract these files and write to disk.
 - Run a second tool to convert the *.fuz files to *.xwm.
@@ -97,7 +97,8 @@ Update 29/09/2023:
 
 ----
 
->> Future project steps:
+**Future project steps**
+
 - (done) Include Powershell code for in bulk, read and extract *.fuz files natively in Powershell.
          Container format that holds .lip + .xwm and extract the xmw file data.
 - (skip) Include Powershell code for in bulk, read and decode *.xwm files natively in Powershell.
@@ -106,24 +107,24 @@ Update 29/09/2023:
 
 -----
 
->> Current method to extract:
+**Current method to extract**
 
 Steps:
-Step 1) -> this takes the longest. This will generate a lot of Gigabytes of data!
-Download the Extraction tool here https://github.com/suglasp/fallout4_fallout76_sfx_conversionkit/fo76_ba2_archive_extract_sounds.ps1    ( or download the B.E.A. Tool https://www.nexusmods.com/fallout4/mods/78/? )
+1. This step takes the longest. This will generate a lot of Gigabytes of data!
+Download the Extraction tool [here](https://github.com/suglasp/fallout4_fallout76_sfx_conversionkit/blob/master/fo76_ba2_archive_extract_sounds.ps1) or download the [B.E.A. Tool](https://www.nexusmods.com/fallout4/mods/78/?).
 
 Parameters (optional):
-fo76_ba2_archive_extract_sounds.ps1 [-InstallPath <fallout4_fallout76_installpath>] [-Fallout "Fallout4"|"Fallout76"|"Fallout76PTS"] [-ExtractDir <extract_dir>]
 
+`.\fo76_ba2_archive_extract_sounds.ps1 [-InstallPath <fallout4_fallout76_installpath>] [-Fallout "Fallout4"|"Fallout76"|"Fallout76PTS"] [-ExtractDir <extract_dir>]`
 
-Open powershell and run .\fo76_ba2_archive_extract_sounds.ps1 -Fallout <FO_game_you_want> -ExtractDir <folder_to_extract>.
+Open powershell and run `.\fo76_ba2_archive_extract_sounds.ps1 -Fallout <FO_game_you_want> -ExtractDir <folder_to_extract>`.
 
 Default, the script will search in the Steam installation folders it finds in Windows Registry.
-If you installed FO4 of FO76 in a custom path, use the flag .\fo76_ba2_archive_extract_sounds.ps1 -InstallPath <path>.
+If you installed FO4 of FO76 in a custom path, use the flag `.\fo76_ba2_archive_extract_sounds.ps1 -InstallPath <path>`.
 The script above will search all *.ba2 files, and will start extracting all *.xwm files or *.fuz files automatically.
 
 Default, the script will target 'Fallout76'. If you want Fallout 4 or Fallout 76 PTS,
-then use the flag .\fo76_ba2_archive_extract_sounds.ps1 -Fallout "Fallout4" or .\fo76_ba2_archive_extract_sounds.ps1 -Fallout "Fallout76PTS"
+then use the flag `.\fo76_ba2_archive_extract_sounds.ps1 -Fallout "Fallout4"` or `.\fo76_ba2_archive_extract_sounds.ps1 -Fallout "Fallout76PTS"`.
 
 Default, the script will create a subfolder "extracted_sfx" in the folder from where it is ran.
 If you want to change the extraction path, use the flag .\fo76_ba2_archive_extract_sounds.ps1 -ExtractDir "<full path to folder>"
@@ -145,26 +146,26 @@ The extract script will locate the archive files automatically.
 When running the script, it will index all *.ba2 files and start extracting all files.
 
 
-Step 2)  -> prepare for conversion of xwm files to wav/mp3
+2. Prepare for conversion of xwm files to wav/mp3
 Copy convert_wav_to_mp3.ps1, convert_fuz_to_xwm.ps1 and convert_xwm_to_wav.ps1 to the extract folder.
-Make a subfolder "ffmpeg"
-Make a subfolder "xWMAEncode"
-
-Download xWMAEncode.exe to the folder "xWMAEncode" from https://www.nexusmods.com/skyrim/mods/32075/?tab=files or https://www.microsoft.com/en-ca/download/details.aspx?id=6812 and extract to folder "xWMAEncode".
-Download ffmpeg static compiled for Windows to "ffmpeg" from https://ffmpeg.org/download.html#build-windows and extract to folder "ffmpeg". (*)
+- Make a subfolder "ffmpeg"
+- Make a subfolder "xWMAEncode"
+- Download [xWMAEncode.exe](https://www.nexusmods.com/skyrim/mods/32075/?tab=files) or [xWMAEncode.exe](https://www.microsoft.com/en-ca/download/details.aspx?id=6812) to the folder "xWMAEncode" and extract to folder "xWMAEncode".
+- Download [ffmpeg](https://ffmpeg.org/download.html#build-windows) static compiled for Windows to "ffmpeg" and extract to folder "ffmpeg". (*)
 
 (*) Inside the "ffmpeg" folder, there needs to be a "bin" folder (so, ..\ffmpeg\bin) where you put the ffmpeg.exe file.
 
 
-Step 3)  -> follow each step as described. This will generate a lot of Gigabytes of data!
-Start powershell
-Set-Location <path_of_ExtractDir> (see above with fo76_ba2_archive_extract_sounds.ps1)
-.\convert_fuz_to_xwm.ps1    <- this converts all *.fuz to *.xwm files (raw)
-.\convert_xwm_to_wav.ps1    <- this converts all *.xwm to *.wav files (raw)
-.\convert_wav_to_mp3.ps1    <- this converts all *.wav to *.mp3 files (compressed)  [optional]
+3. follow each step as described. This will generate a lot of Gigabytes of data!
+- `Start powershell`
+- `Set-Location <path_of_ExtractDir>` (see above with fo76_ba2_archive_extract_sounds.ps1)
+- `.\convert_fuz_to_xwm.ps1`    <- this converts all *.fuz to *.xwm files (raw)
+- `.\convert_xwm_to_wav.ps1`    <- this converts all *.xwm to *.wav files (raw)
+- `.\convert_wav_to_mp3.ps1`    <- this converts all *.wav to *.mp3 files (compressed)  [optional]
 
 Parameters (optional):
-.\convert_XXX_to_XXX.ps1 [-CustomDir <custom_path_dir>]
+`.\convert_XXX_to_XXX.ps1 [-CustomDir <custom_path_dir>]`
+
 
 
 Have fun,
