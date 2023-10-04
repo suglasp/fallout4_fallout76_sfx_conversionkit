@@ -1,1 +1,1 @@
-https://ffmpeg.zeranoe.com/builds/
+https://ffmpeg.org/download.html#build-windows
